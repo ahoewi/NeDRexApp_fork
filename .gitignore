@@ -1,0 +1,9 @@
+target/*
+target/
+resources/
+resources/*
+.DS_Store
+.settings/
+.settings/*
+.classpath
+.project
