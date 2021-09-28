@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -49,15 +48,15 @@ import org.slf4j.LoggerFactory;
  * NeDRex App
  * @author Sepideh Sadegh
  */
-public class MechBasedValidTask extends AbstractTask{
+public class DrugValidationTask extends AbstractTask{
 	private RepoApplication app;
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	private RepoResultPanel resultPanel;
 	private String pvalue;
-	private String pvalue_prec;
+	private String pvalue_DCG;
 	
 	@ProvidesTitle
-	public String getTitle() {return "Set Parameters for Mechanism-centric Validation Algorithm";}
+	public String getTitle() {return "Set Parameters for Drugs Validation Algorithm";}
 	
 	@Tunable(description="Number of permutations", groups="Algorithm settings",
 			params="slider=true",
@@ -77,40 +76,28 @@ public class MechBasedValidTask extends AbstractTask{
 	
 	@Tunable(description="Input file for drugs indicated for disease:" ,  params= "input=true", groups="Reference drugs",
 			dependsOn="trueDrugFile=true",
-			tooltip="Input file containing list of indicated drugs for treatment of disease, one drug per line. The file should be a tab-separated file and the first column will be taken as drugs. Drugs with DrugBank IDs are acceptable as input.",
+			tooltip="Input file containing list of drugs indicated for treatment of disease, one drug per line. The file should be a tab-separated file and the first column will be taken as drugs. Drugs with DrugBank IDs are acceptable as input.",
 			gravity = 3.5)
 	public File inputTDFile = new File(System.getProperty("user.home"));
 	
 	@Tunable(description="Read drugs to be validated from a file", groups="Drugs for validation",
-			tooltip="If selected, a list of drugs to-be-validated will be read from a file. Otherwise, all drugs in the current network will be taken as drugs to-be-validated.",
+			tooltip="If selected, a list of drugs to-be-validated will be read from a file. Otherwise, all drugs in the current network with their ranks from node table will be taken as drugs to-be-validated.",
 			gravity = 3.0)
     public Boolean resultDrugFile = false;
 	
 	@Tunable(description="Input file for drugs to be validated:" ,  params= "input=true", groups="Drugs for validation",
 			dependsOn="resultDrugFile=true",
-			tooltip="Input file containing list of drugs with their ranks, one drug per line. The file should be a tab-separated file, the first column will be taken as drugs."
-					+ "DrugBank IDs are acceptable.",
+			tooltip="Input file containing list of drugs with their ranks, one drug per line. The file should be a tab-separated file, the first column will be taken as drugs and \"\n" + 
+					"+ \"second column as ranks. Drugs with DrugBank IDs are acceptable as input.",
 			gravity = 3.5)
 	public File inputRDFile = new File(System.getProperty("user.home"));
-	
-	@Tunable(description="Read disease module from a file", groups="Disease module",
-			tooltip="If selected, disease module's genes/proteins will be read from a file. Otherwise, all the genes/protein in the current network will be taken as disease module.",
-			gravity = 3.0)
-    public Boolean moduleFile = false;
-	
-	@Tunable(description="Input file for disease module:" ,  params= "input=true", groups="Disease module",
-			dependsOn="moduleFile=true",
-			tooltip="Input file containing list of module's genes/proteins, one entity per line. The file should be a tab-separated file, the first column will be taken as module's gene/protein."
-					+ "Entrez IDs for genes and Uniprot AC for proteins are acceptable.",
-			gravity = 4.0)
-	public File inputModuleFile = new File(System.getProperty("user.home"));
 	
 	@Tunable(description="Description of the validation run", groups="Validation result", 
 	         tooltip="Write a description of the validation job you are running to be shown in the result panel. For example, name of the disease. This helps tracking your analyses",
 	         gravity = 5.0)
 	public String job_description = new String();
 	
-	public MechBasedValidTask(RepoApplication app, RepoResultPanel resultPanel) {
+	public DrugValidationTask (RepoApplication app, RepoResultPanel resultPanel) {
 		this.app = app;
 		this.resultPanel = resultPanel;
 	}
@@ -119,7 +106,7 @@ public class MechBasedValidTask extends AbstractTask{
 		SwingUtilities.invokeLater(
 			new Runnable() {
 				public void run() {
-					JOptionPane.showMessageDialog(null, "The computation is taking very long! It continues running in the backend, to get the results please try again using the same parameters and input for the algorithm in 15 mins!", "Long run-time", JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(null, "The computation is taking very long! It continues running in the backend, to get the results please try again using the same parameters and input for the algorithm in 10 mins!", "Long run-time", JOptionPane.WARNING_MESSAGE);
 				}
 			}
 		);
@@ -138,15 +125,12 @@ public class MechBasedValidTask extends AbstractTask{
 	@Override
 	public void run(TaskMonitor taskMonitor) throws Exception {
 		CyNetwork network = app.getCurrentNetwork();
-		String submit_url = Constant.API_LINK + "validation/mechanism_based";
+		String submit_url = Constant.API_LINK + "validation/drug";
 		String status_url = Constant.API_LINK + "validation/status";
 		
 		JSONObject payload = new JSONObject();
 		List<String> true_drugs = new ArrayList<String>();		
-		List<String> result_drugs = new ArrayList<String>();	
-//		List<List<String>> result_drugs = new ArrayList<List<String>>();
-		List<String> module_members = new ArrayList<String>();
-		String module_member_type = "";
+		List<List<String>> result_drugs = new ArrayList<List<String>>();	
 		int sleep_time = 2; //in seconds
 		
 		if (!trueDrugFile) {
@@ -182,8 +166,11 @@ public class MechBasedValidTask extends AbstractTask{
 		if (!resultDrugFile) {
 			Set<CyNode> result_drugs_nodes = FilterType.nodesOfType(network, NodeType.Drug);
 			for (CyNode n: result_drugs_nodes) {
-				result_drugs.add(network.getRow(n).get(CyNetwork.NAME, String.class));
-			}
+				List<String> e = new ArrayList<String>(2);
+				e.add(network.getRow(n).get(CyNetwork.NAME, String.class));
+				e.add(network.getRow(n).get("rank", Integer.class).toString());
+				result_drugs.add(e);
+			}					
 		}
 		else if (resultDrugFile) {
 			String fp = inputRDFile.getPath();
@@ -192,7 +179,10 @@ public class MechBasedValidTask extends AbstractTask{
 				String dataRow = br.readLine();//skip header line
 				while (dataRow != null){
 					String[] data = dataRow.split("\t");
-					result_drugs.add(data[0]);
+					List<String> e = new ArrayList<String>(2);
+					e.add(data[0]);
+					e.add(data[1]);
+					result_drugs.add(e);						
 					dataRow = br.readLine();
 				}
 			}			
@@ -201,52 +191,11 @@ public class MechBasedValidTask extends AbstractTask{
 		logger.info("The list of result drugs: " + result_drugs);
 		logger.info("Length of result drugs list: " + result_drugs.size());
 		
-		if (!moduleFile) {
-			Set<String> nodeTypes = new HashSet<String>(network.getDefaultNodeTable().getColumn("type").getValues(String.class));
-			Set<CyNode> module_nodes = new HashSet<CyNode>();
-			if (nodeTypes.contains(NodeType.Gene.toString())) {
-				module_nodes = FilterType.nodesOfType(network, NodeType.Gene);
-				module_member_type = "gene";
-			}
-			else if (nodeTypes.contains(NodeType.Protein.toString())) {
-				module_nodes = FilterType.nodesOfType(network, NodeType.Protein);
-				module_member_type = "protein";
-			}		
-			for (CyNode n: module_nodes) {
-				module_members.add(network.getRow(n).get(CyNetwork.NAME, String.class));
-			}					
-		}
-		else if (moduleFile) {
-			String fp = inputModuleFile.getPath();
-			try {
-				BufferedReader br = new BufferedReader(new FileReader(fp));
-				String dataRow = br.readLine();//skip header line
-				while (dataRow != null){
-					String[] data = dataRow.split("\t");
-					if(!module_members.contains(data[0])) {
-						if (data[0].contains("entrez") || data[0].matches("[0-9]+")) {
-							module_member_type = "gene";
-							}
-						else if (data[0].contains("uniprot")) {
-							module_member_type = "protein";
-							}
-						module_members.add(data[0]);
-					}						
-					dataRow = br.readLine();
-				}
-			}			
-			catch (IOException e) {e.printStackTrace();}
-		}
-		logger.info("The list of module nodes: " + module_members);
-		logger.info("Size of module: " + module_members.size());
-		
 		payload.put("test_drugs", result_drugs);
 		payload.put("true_drugs", true_drugs);
 		payload.put("permutations", permutations.getValue());
 		payload.put("only_approved_drugs", only_approved);
-		payload.put("module_members", module_members);
-		payload.put("module_member_type", module_member_type);
-	    
+		
 		logger.info("The post JSON converted to string: " + payload.toString());
 		
 		HttpPost post = new HttpPost(submit_url);
@@ -306,8 +255,8 @@ public class MechBasedValidTask extends AbstractTask{
 				boolean Failed = false;
 				  
 				  // we're letting it to run for t*2 seconds
-				double n = 200;
-				for (int t=0; t<200; t++) {
+				double n = 150;
+				for (int t=0; t<150; t++) {
 					taskMonitor.setProgress(0.1+ t* (1.0-0.1)/n);
 					String  responseText = "";
 					BufferedReader rd = new BufferedReader (new InputStreamReader(response.getEntity().getContent()));
@@ -329,52 +278,12 @@ public class MechBasedValidTask extends AbstractTask{
 						
 						JSONParser parser = new JSONParser();
 						JSONObject json = (JSONObject) parser.parse(responseText);
-						logger.info("The p-val of the response json onbject: " + json.get("emprirical p-value"));
-						logger.info("The p-val (precision-based) of the response json onbject: " + json.get("empircal (precision-based) p-value"));
-						pvalue = String.valueOf(json.get("emprirical p-value"));
-						pvalue_prec = String.valueOf(json.get("empircal (precision-based) p-value"));
+						logger.info("The result values of the response json onbject for empirical DCG-based p-value: " + json.get("empirical DCG-based p-value"));
 						
-						/*JSONArray jarrEdges = (JSONArray) json2.get("edges");
-						JSONArray jarrDiamondNodes = (JSONArray) json2.get("diamond_nodes");
-						JSONArray jarrSeeds = (JSONArray) json2.get("seeds_in_network");
+						pvalue_DCG = String.valueOf(json.get("empirical DCG-based p-value"));
+						pvalue = String.valueOf(json.get("empirical p-value without considering ranks"));
 						
-						Set<List<String>> edges = new HashSet<List<String>> ();
-						Set<String> diamondNodes = new HashSet<String> ();
-						Map<String, Integer> scoreMap = new HashMap <String, Integer>();
-						Map<String, Double> pHyperMap = new HashMap <String, Double>();
-						
-						for (Object e: jarrEdges) {
-							List<String> nn = (ArrayList<String>)e;						
-							edges.add(nn);
-							diamondNodes.add(nn.get(0));
-							diamondNodes.add(nn.get(1));					
-//							logger.info(e.toString() + " - and the ndoes: " + nn.get(0) + " and " + nn.get(1) );
-						}
-						
-						for (Object diamondNode: jarrDiamondNodes) {
-							 JSONObject dnobj = (JSONObject) diamondNode;
-							 String dnName = (String) dnobj.get("DIAMOnD_node");
-							 String rk = (String) dnobj.get("rank");
-							 Integer rank = Integer.parseInt(rk);
-							 String ph = (String) dnobj.get("p_hyper");
-							 Double phyp = Double.parseDouble(ph);
-							 diamondNodes.add(dnName);
-							 scoreMap.put(dnName, rank);
-							 pHyperMap.put(dnName, phyp);
-						}
-						
-						for (Object seedObj: jarrSeeds) {
-							 String seed = (String) seedObj;
-							 diamondNodes.add(seed);
-							 seeds_in_network.add(seed);
-						}*/
-						
-//						DialogTaskManager taskmanager = app.getActivator().getService(DialogTaskManager.class);
-//						taskmanager.execute(new TaskIterator(new DiamondCreateNetTask(app, false, diamondNodes, edges, scoreMap, pHyperMap, seeds_in_network, ggType, newNetName)));
-						
-//						resultPanel.activateFromMechanismValidation(this);
-//						resultPanel.activateFromJointValidation(this);
-						
+						resultPanel.activateFromDrugValidation(this);
 						break;
 					}
 					if (Failed) {
@@ -419,8 +328,8 @@ public class MechBasedValidTask extends AbstractTask{
 		return pvalue;
 	}
 	
-	public String getPValPrec() {
-		return pvalue_prec;
+	public String getPValDCG() {
+		return pvalue_DCG;
 	}
 	
 	public Integer getPermutations() {
@@ -430,7 +339,7 @@ public class MechBasedValidTask extends AbstractTask{
 	public String getApproved() {
 		String approved;
 		if (only_approved) {
-			approved = " only approved";
+			approved = "only approved";
 		}
 		else {
 			approved = "all";
@@ -441,6 +350,5 @@ public class MechBasedValidTask extends AbstractTask{
 	public String getDescription() {
 		return job_description;
 	}
-	
 
 }

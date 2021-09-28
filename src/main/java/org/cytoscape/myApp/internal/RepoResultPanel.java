@@ -18,7 +18,10 @@ import org.cytoscape.application.swing.CytoPanelName;
 import org.cytoscape.application.swing.CytoPanelState;
 import org.cytoscape.myApp.internal.tasks.BiConTask;
 import org.cytoscape.myApp.internal.tasks.DrugBasedValidTask;
+import org.cytoscape.myApp.internal.tasks.DrugValidationTask;
+import org.cytoscape.myApp.internal.tasks.JointValidationTask;
 import org.cytoscape.myApp.internal.tasks.MechBasedValidTask;
+import org.cytoscape.myApp.internal.tasks.ModuleValidationTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -191,8 +194,9 @@ public class RepoResultPanel extends JPanel implements CytoPanelComponent{
 		activate();
 	}
 	
-	public void activateFromDrugValidation(DrugBasedValidTask drValTask){
-		JLabel label = new JLabel("<html><b>Validation of results based on drug-centric method</b></html>");
+	public void activateFromDrugValidation(DrugValidationTask drValTask){
+		JLabel label = new JLabel("<html><b>Validation of the candidate drugs returned by NeDRex</b></html>");
+		
 		JLabel settingslabel = new JLabel("Settings: number of permutations " +  drValTask.getPermutations().toString() + ", considering " + drValTask.getApproved()
 		+ " drugs in NeDRexDB");
 		JLabel pvallabel = new JLabel("Empirical p-value: " + drValTask.getPVal());
@@ -227,13 +231,14 @@ public class RepoResultPanel extends JPanel implements CytoPanelComponent{
 		activate();
 	}
 	
-	public void activateFromMechanismValidation(MechBasedValidTask mechValTask){
-		JLabel label = new JLabel("<html><b>Validation of results based on mechanism-centric method</b></html>");
-		JLabel settingslabel = new JLabel("Settings: number of permutations " +  mechValTask.getPermutations().toString() + ", considering " + mechValTask.getApproved()
+	public void activateFromJointValidation(JointValidationTask jointValTask){
+//	public void activateFromJointValidation(MechBasedValidTask mechValTask){
+		JLabel label = new JLabel("<html><b>Joint validation of the disease module and drugs returned by NeDRex</b></html>");
+		JLabel settingslabel = new JLabel("Settings: number of permutations " +  jointValTask.getPermutations().toString() + ", considering " + jointValTask.getApproved()
 		+ " drugs in NeDRexDB");
-		JLabel pvallabel = new JLabel("Empirical p-value: " + mechValTask.getPVal());
-		JLabel pvalpreclabel = new JLabel("Empirical p-value (based on precision): " + mechValTask.getPValPrec());
-		JLabel decriptionlabel = new JLabel("Description of the validation run: " + mechValTask.getDescription());
+		JLabel pvallabel = new JLabel("Empirical p-value: " + jointValTask.getPVal());
+		JLabel pvalpreclabel = new JLabel("Empirical p-value (based on precision): " + jointValTask.getPValPrec());
+		JLabel decriptionlabel = new JLabel("Description of the validation run: " + jointValTask.getDescription());
 		scrollPanePanel.add(Box.createVerticalStrut(10));
 		scrollPanePanel.add(label);
 		scrollPanePanel.add(Box.createVerticalStrut(10));
@@ -262,6 +267,41 @@ public class RepoResultPanel extends JPanel implements CytoPanelComponent{
 
 		activate();
 	}
+	
+	public void activateFromModuleValidation(ModuleValidationTask moduleValTask){
+		JLabel label = new JLabel("<html><b>JValidation of the disease module returned by NeDRex</b></html>");
+		JLabel settingslabel = new JLabel("Settings: number of permutations " +  moduleValTask.getPermutations().toString() + ", considering " + moduleValTask.getApproved()
+		+ " drugs in NeDRexDB");
+		JLabel pvallabel = new JLabel("Empirical p-value: " + moduleValTask.getPVal());
+		JLabel pvalpreclabel = new JLabel("Empirical p-value (based on precision): " + moduleValTask.getPValPrec());
+		JLabel decriptionlabel = new JLabel("Description of the validation run: " + moduleValTask.getDescription());
+		scrollPanePanel.add(Box.createVerticalStrut(10));
+		scrollPanePanel.add(label);
+		scrollPanePanel.add(Box.createVerticalStrut(10));
+		scrollPanePanel.add(settingslabel);
+		scrollPanePanel.add(decriptionlabel);
+		scrollPanePanel.add(Box.createVerticalStrut(10));
+		scrollPanePanel.add(pvallabel);
+		scrollPanePanel.add(pvalpreclabel);
+		scrollPanePanel.add(Box.createVerticalStrut(50));
+
+		JButton deleteButton = new JButton("Delete this result");
+		scrollPanePanel.add(deleteButton);
+		deleteButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent actionEvent) {
+				scrollPanePanel.remove(label);
+				scrollPanePanel.remove(pvallabel);
+				scrollPanePanel.remove(pvalpreclabel);
+				scrollPanePanel.remove(decriptionlabel);
+				scrollPanePanel.remove(settingslabel);
+				scrollPanePanel.remove(deleteButton);
+				scrollPanePanel.repaint();
+			}
+		});
+
+		activate();
+		}
 
 	public void deactivate() {
 		this.app.getActivator().unregisterAllServices(this);

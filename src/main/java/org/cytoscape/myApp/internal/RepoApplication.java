@@ -84,8 +84,11 @@ public class RepoApplication {
 		this.application.addAction(new ClosenessDrugAction(this));
 		this.application.addAction(new TrustRankDrugAction(this));
 		
-		this.application.addAction(new DrugBasedValidAction(this, resultPanel));
-		this.application.addAction(new MechanismBasedValidAction(this, resultPanel));
+//		this.application.addAction(new DrugBasedValidAction(this, resultPanel));
+//		this.application.addAction(new MechanismBasedValidAction(this, resultPanel));
+		this.application.addAction(new DrugValidationAction(this, resultPanel));
+		this.application.addAction(new ModuleValidationAction(this, resultPanel));
+		this.application.addAction(new JointValidationAction(this, resultPanel));
 		
 		this.application.addAction(new SelectNodeFileAction(this));
 		this.application.addAction(new SelectAllNodeOfTypeAction(this));

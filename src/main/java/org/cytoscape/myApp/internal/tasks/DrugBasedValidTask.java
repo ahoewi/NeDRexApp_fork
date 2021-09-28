@@ -328,7 +328,8 @@ public class DrugBasedValidTask extends AbstractTask{
 						
 //						DialogTaskManager taskmanager = app.getActivator().getService(DialogTaskManager.class);
 //						taskmanager.execute(new TaskIterator(new DiamondCreateNetTask(app, false, diamondNodes, edges, scoreMap, pHyperMap, seeds_in_network, ggType, newNetName)));
-						resultPanel.activateFromDrugValidation(this);
+
+//						resultPanel.activateFromDrugValidation(this);
 						break;
 					}
 					if (Failed) {
@@ -384,7 +385,7 @@ public class DrugBasedValidTask extends AbstractTask{
 	public String getApproved() {
 		String approved;
 		if (only_approved) {
-			approved = " only approved";
+			approved = "only approved";
 		}
 		else {
 			approved = "all";
