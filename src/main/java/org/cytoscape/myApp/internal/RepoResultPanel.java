@@ -269,7 +269,7 @@ public class RepoResultPanel extends JPanel implements CytoPanelComponent{
 	}
 	
 	public void activateFromModuleValidation(ModuleValidationTask moduleValTask){
-		JLabel label = new JLabel("<html><b>JValidation of the disease module returned by NeDRex</b></html>");
+		JLabel label = new JLabel("<html><b>Validation of the disease module returned by NeDRex</b></html>");
 		JLabel settingslabel = new JLabel("Settings: number of permutations " +  moduleValTask.getPermutations().toString() + ", considering " + moduleValTask.getApproved()
 		+ " drugs in NeDRexDB");
 		JLabel pvallabel = new JLabel("Empirical p-value: " + moduleValTask.getPVal());

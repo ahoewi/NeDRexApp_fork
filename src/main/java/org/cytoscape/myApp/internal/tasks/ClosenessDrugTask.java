@@ -269,8 +269,8 @@ public class ClosenessDrugTask extends AbstractTask{
 				HttpResponse response = client.execute(request);
 				boolean Failed = false;			  
 				  // we're letting it build for t*3 seconds
-				double nd = 5;
-				for (int t=0; t<5; t++) {
+				double nd = 200;
+				for (int t=0; t<200; t++) {
 					taskMonitor.setProgress(0.1+ t* (1.0-0.1)/nd);
 					String  responseText = "";
 					BufferedReader rd = new BufferedReader (new InputStreamReader(response.getEntity().getContent()));
