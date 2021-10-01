@@ -36,9 +36,10 @@ public class JointValidationAction extends AbstractCyAction{
 				"repurposing pipeline, i.e. disease module identification and drug ranking, as a whole in the<br>" +
 				"final validation of results.<br><br>" +
 				"Before continuing with this function, make sure you have:<br>" +
-				"a) already run one of the drug prioritization functions and the returned subnetwork is open;<br> " +
+				"a) run one of the disease module identification and one of the drug prioritization functions,<br> " +
+				"   in a sequence, and the returned subnetwork (including the module and drugs) is open;<br>" +
 				"b) a list of drugs indicated for the treatment of the disease to be used as reference true drugs.<br><br></body></html>";
-		this.infoBox = new InfoBox(app, message, Constant.TUTORIAL_LINK+"availableFunctions.html#mechanism-centric-method");
+		this.infoBox = new InfoBox(app, message, Constant.TUTORIAL_LINK+"availableFunctions.html#joint-module-drugs");
 		putValue(SHORT_DESCRIPTION, "A statistical method to jointly validate the disease module and the drug candidates returned by NeDRex repurposing approach.");
 	}
 

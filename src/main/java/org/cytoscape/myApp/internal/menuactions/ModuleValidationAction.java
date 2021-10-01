@@ -32,14 +32,17 @@ public class ModuleValidationAction extends AbstractCyAction{
 		String message = "<html><body>This disease module validation method is one of the three validation methods that can be used<br>" + 
 				"to evaluate the statistical significance of the results returned by NeDRex repurposing pipeline.<br>"+
 				"This method takes into account the role of disease module identification step in the NeDRex drug<br>" +
-				"repurposing pipeline. The significance of the result disease module is estimated by calculating an<br>" +
-				"empirical P-value by counting the number of mock modules whose drug lists have larger overlap with<br>" +
-				"the reference list of drugs than that of the disease module returned by NeDRex.<br><br>" +
+				"repurposing pipeline. We define precision as the number of reference drugs targeting the module<br>" + 
+				"divided by the overall number of drugs targeting the module. The significance of the result<br>" +
+				"disease module is estimated by calculating an empirical P-value by counting the number of<br>" +
+				"mock modules with higher precision values than the disease module computed by NeDRex. In a<br>"+
+				"simplified version, we compare intersection sizes with the reference drugs instead of<br>" +
+				" precision values. <br><br>"+
 				"Before continuing with this function, make sure you have:<br>" +
-				"a) already run one of the drug prioritization functions and the returned subnetwork is open;<br> " +
+				"a) run one of the disease module identification functions and the returned subnetwork is open;<br> " +
 				"b) a list of drugs indicated for the treatment of the disease to be used as reference true drugs.<br><br></body></html>";
-		this.infoBox = new InfoBox(app, message, Constant.TUTORIAL_LINK+"availableFunctions.html#mechanism-centric-method");
-		putValue(SHORT_DESCRIPTION, "A statistical method to jointly validate the disease module and the drug candidates returned by NeDRex repurposing approach.");
+		this.infoBox = new InfoBox(app, message, Constant.TUTORIAL_LINK+"availableFunctions.html#disease-module");
+		putValue(SHORT_DESCRIPTION, "A statistical method to jointly validate the disease module returned by NeDRex repurposing approach.");
 	}
 
 	@Override

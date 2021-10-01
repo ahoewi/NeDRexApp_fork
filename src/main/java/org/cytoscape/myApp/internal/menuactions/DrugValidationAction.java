@@ -37,9 +37,9 @@ public class DrugValidationAction extends AbstractCyAction{
 				"list of drugs than that of the NeDRex result list. In a variation of this method (DCG-based)<br>" +
 				"the ranks of the reference drugs in the output are also considered.<br><br>" + 
 				"Before continuing with this function, make sure you have:<br>" +
-				"a) already run one of the drug prioritization functions and the returned subnetwork is open;<br> " +
+				"a) run one of the drug prioritization functions and the returned subnetwork is open;<br> " +
 				"b) a list of drugs indicated for the treatment of the disease to be used as reference true drugs.<br><br></body></html>";
-		this.infoBox = new InfoBox(app, message, Constant.TUTORIAL_LINK+"availableFunctions.html#drug-centric-method");
+		this.infoBox = new InfoBox(app, message, Constant.TUTORIAL_LINK+"availableFunctions.html#drug-list");
 		putValue(SHORT_DESCRIPTION, "A statistical method to validate the drug candidates returned by NeDRex repurposing approach.");
 		}
 
