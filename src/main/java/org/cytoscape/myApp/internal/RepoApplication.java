@@ -32,7 +32,9 @@ public class RepoApplication {
 	private String version = "1.0-test"; // we update this as we do for AboutPanel
 
 	private JDialog aboutDialog;
+	private JDialog licenseDialog;
 	private AboutPanel aboutPanel;
+	private LicensePanel licensePanel;
 //	private JDialog quickSelectDialog;
 	private JDialog quickSelectDialog2;
 	private QuickSelectPanel2 quickSelectPanel2;
@@ -53,6 +55,20 @@ public class RepoApplication {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				aboutPanel.deactivate();
+			}
+		});
+		
+		licenseDialog = new JDialog(application.getJFrame(), true);
+		licenseDialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+		centerOnScreen(licenseDialog);
+
+		this.licensePanel = new LicensePanel(this);
+
+		this.licenseDialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		this.licenseDialog.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				licensePanel.deactivate();
 			}
 		});
 		
@@ -114,6 +130,8 @@ public class RepoApplication {
 		this.application.addAction(new ShowResultPanelAction(resultPanel));
 		
 		this.application.addAction(new AboutAction(this, aboutPanel));
+		
+		this.application.addAction(new LicenseAction(this, licensePanel));
 
 	}
 
@@ -127,6 +145,14 @@ public class RepoApplication {
 
 	public AboutPanel getAboutPanel() {
 		return aboutPanel;
+	}
+	
+	public LicensePanel getLicensePanel() {
+		return licensePanel;
+	}
+	
+	public JDialog getLicenseDialog(){
+		return this.licenseDialog;
 	}
 
 	public void centerOnScreen(final Component c) {

@@ -175,7 +175,7 @@ public class AboutPanel extends JPanel {
             description.setFont(new Font("Helvetica", Font.PLAIN, 14));
             topPanel.add(description);
             
-            JLabel nedrexLabel = new JLabel("<html>For more information about the platform and <b>use agreement</b> please visit:</html>");
+            JLabel nedrexLabel = new JLabel("<html>For more information about the platform and <b>Terms of Use</b> please visit:</html>");
             nedrexLabel.setBorder(new EmptyBorder(10,10,1,10));
             nedrexLabel.setFont(new Font("Helvetica", Font.PLAIN, 14));
             topPanel.add(nedrexLabel); 

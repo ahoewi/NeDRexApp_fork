@@ -37,7 +37,9 @@ public class RepoTrialDBWebServiceClient extends AbstractWebServiceGUIClient imp
 			"<br>For more information about the versions of databases integrated in the current version of the <b>NeDRexDB</b> use the <font color = \\\"#143e82\\\">Info</font> button."
 			+ "<br><br><b>NeDRexDB</b> contains information from the <b>Online Mendelian Inheritance in Man® (OMIM®)</b> database, "
             + "which has been obtained under a license from the Johns Hopkins University.  NeDRexDB does not "
-            + "represent the entire, unmodified OMIM® database, which is available in its entirety at <a href=\"https://omim.org/downloads\">https://omim.org/downloads</a><br>" 
+            + "represent the entire, unmodified OMIM® database, which is available in its entirety at <a href=\"https://omim.org/downloads\">https://omim.org/downloads</a><br>"
+            + "<br><br><b>License Agreement:</b> By using the NeDRex platform you are entering a legally binding agreement. Using the NeDRex platform implies that you agree to the Terms of Use. "
+            + "If you do not agree with the Terms of Use, do not use the platform. The Terms of Use are available at: <a href=\"https://api.nedrex.net/static/licence\">https://api.nedrex.net/static/licence</a>"
 			+ "</html>";
 	
 

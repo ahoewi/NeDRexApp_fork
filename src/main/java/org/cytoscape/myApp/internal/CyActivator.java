@@ -2,14 +2,11 @@ package org.cytoscape.myApp.internal;
 
 import java.util.Properties;
 
-import org.cytoscape.model.events.NetworkAboutToBeDestroyedListener;
-import org.cytoscape.model.events.NetworkAddedListener;
 import org.cytoscape.myApp.internal.tasks.DeselectSingleNodeTaskFactory;
 import org.cytoscape.myApp.internal.tasks.OpenEntryInDBTaskFactory;
 import org.cytoscape.myApp.internal.ui.RepoTrialDBWebServiceClient;
 import org.cytoscape.service.util.AbstractCyActivator;
 import org.cytoscape.service.util.CyServiceRegistrar;
-import org.cytoscape.session.events.SessionLoadedListener;
 import org.cytoscape.task.NodeViewTaskFactory;
 import org.osgi.framework.BundleContext;
 

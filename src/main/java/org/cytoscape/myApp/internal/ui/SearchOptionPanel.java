@@ -31,7 +31,7 @@ public class SearchOptionPanel extends JPanel{
 	
 	JPanel edgeOptions;
 	JCheckBox edgeTypeGD, edgeTypeGP, edgeTypePP, edgeTypeDrP, edgeTypeDrDis, edgeTypeDD, edgeTypePwP;
-	JCheckBox approved, experimental, illicit, investig, nutraceu, vetApprov, withdrawn; 
+	JCheckBox agreed, approved, experimental, illicit, investig, nutraceu, vetApprov, withdrawn; 
 	JCheckBox selfLoop;
 	JCheckBox iidEvid;
 	JCheckBox omim;
@@ -67,6 +67,9 @@ public class SearchOptionPanel extends JPanel{
 		
 		JPanel newNetworkOptions = createnewNetOptions();
 		add(newNetworkOptions, c.down().expandBoth().insets(7,5,0,5));
+		
+		JPanel licenseAgreement = createLicenseAgreement();
+		add(licenseAgreement, c.down().expandBoth().insets(7,5,0,5));
 
 	}
 	
@@ -427,6 +430,29 @@ public class SearchOptionPanel extends JPanel{
 		return additionalOptionPanel;
 	}
 	
+	JPanel createLicenseAgreement() {
+
+		JPanel licenseAgreementPanel = new JPanel(new GridBagLayout());
+		licenseAgreementPanel.setPreferredSize(new Dimension(600,30));
+		licenseAgreementPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+		EasyGBC c = new EasyGBC();
+		JLabel agreementLabel = new JLabel("<html><b>License Agreement:</b></html>");		
+		c.anchor("west").insets(0,5,0,5);
+		licenseAgreementPanel.add(agreementLabel, c);
+		
+		c.right().noExpand().insets(0,10,0,5);		
+		agreed = new JCheckBox("I agree with the NeDRex Terms of Use.", false);
+		agreed.setToolTipText("If you want to use the NeDRex app, you need to first agree with our terms of use. The NeDRex Terms of Use are available at: https://api.nedrex.net/static/licence");
+		licenseAgreementPanel.add(agreed, c);
+		
+//		c.right().noExpand().insets(0,10,0,1);
+//		JLabel netName = new JLabel("Network name");
+//		netName.setToolTipText("Enter the name you would like to be assigned to the loaded network, otherwise a unique id will be assigned.");
+//		additionalOptionPanel.add(netName, c);
+
+		return licenseAgreementPanel;
+	}
+	
 	public Boolean getSelfLoop() {
 		Boolean sl = selfLoop.isSelected();
 		return sl;
@@ -555,6 +581,10 @@ public class SearchOptionPanel extends JPanel{
 			selDrugGroup.add("illicit");
 
 		return selDrugGroup;
+	}
+	
+	public Boolean getAgreementStatus() {
+		return agreed.isSelected();
 	}
 
 }

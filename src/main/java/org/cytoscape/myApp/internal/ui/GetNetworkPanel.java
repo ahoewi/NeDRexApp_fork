@@ -31,9 +31,11 @@ import org.apache.http.util.EntityUtils;
 import org.cytoscape.myApp.internal.AboutPanel;
 import org.cytoscape.myApp.internal.Constant;
 import org.cytoscape.myApp.internal.ImportAction;
+import org.cytoscape.myApp.internal.LicensePanel;
 import org.cytoscape.myApp.internal.LoadNetworkTask;
 import org.cytoscape.myApp.internal.RepoApplication;
 import org.cytoscape.myApp.internal.menuactions.AboutAction;
+import org.cytoscape.myApp.internal.menuactions.LicenseAction;
 import org.cytoscape.work.TaskIterator;
 import org.cytoscape.work.swing.DialogTaskManager;
 import org.json.simple.JSONObject;
@@ -51,11 +53,13 @@ public class GetNetworkPanel extends JPanel{
 	SearchOptionPanel optionsPanel;
 	JButton importButton;
 	AboutPanel aboutPanel;
+	LicensePanel licensePanel;
 	
 	public GetNetworkPanel(RepoApplication app) {
 		super(new GridBagLayout());
 		this.app = app;
 		this.aboutPanel = this.app.getAboutPanel();
+		this.licensePanel = this.app.getLicensePanel();
 		init();
 	}
 	
@@ -73,7 +77,7 @@ public class GetNetworkPanel extends JPanel{
 		add(buttonPanel, c.down().expandHoriz().insets(0,5,5,5));
 	}
 	
-	JPanel createSearchPanel() {
+	/*JPanel createSearchPanel() {
 		JPanel searchPanel = new JPanel(new GridBagLayout());
 		searchPanel.setPreferredSize(new Dimension(600,400));
 		EasyGBC c = new EasyGBC();
@@ -88,15 +92,20 @@ public class GetNetworkPanel extends JPanel{
 		c.down().expandBoth().insets(5,10,5,10);
 		searchPanel.add(jsp, c);
 		return searchPanel;
-	}
+	}*/
 	
 	JPanel createControlButtons() {
 		JPanel buttonPanel = new JPanel();
 		BoxLayout layout = new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS);
 		buttonPanel.setLayout(layout);
+		
 		JButton infoButton = new JButton("Info");
 		infoButton.addActionListener(new AboutAction(this.app, this.aboutPanel));
 		buttonPanel.add(infoButton);
+		
+		JButton touButton = new JButton("Terms of Use");
+		touButton.addActionListener(new LicenseAction(this.app, this.licensePanel));
+		buttonPanel.add(touButton);
 
 		//importButton = new JButton(new InitialAction());
 		importButton = new JButton(new ImportAction(app, optionsPanel));

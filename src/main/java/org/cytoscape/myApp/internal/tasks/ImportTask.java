@@ -17,6 +17,7 @@ import org.cytoscape.myApp.internal.ui.SearchOptionPanel;
 import org.cytoscape.work.AbstractTask;
 import org.cytoscape.work.TaskIterator;
 import org.cytoscape.work.TaskMonitor;
+import org.cytoscape.work.TaskMonitor.Level;
 import org.cytoscape.work.swing.DialogTaskManager;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -27,6 +28,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 /**
  * NeDRex App
  * @author Sepideh Sadegh, Judith Bernett
@@ -40,9 +44,23 @@ public class ImportTask extends AbstractTask {
         this.app = app;
         this.optionsPanel = optionsPanel;
     }
+    
+    protected void showWarningTime() {
+		SwingUtilities.invokeLater(
+			new Runnable() {
+				public void run() {
+					JOptionPane.showMessageDialog(null, "If you want to use the NeDRex app, you need to first agree with our terms of use. The NeDRex Terms of Use are available at: https://api.nedrex.net/static/licence or via the Terms of Use menu in the App.", "License Agreement", JOptionPane.WARNING_MESSAGE);
+				}
+			}
+		);
+	}
 
     @Override
     public void run(TaskMonitor taskMonitor) throws Exception {
+    	
+    	Boolean agreementStatus = optionsPanel.getAgreementStatus();
+    	
+    	if (agreementStatus) {
         taskMonitor.setTitle("Importing the network");
         taskMonitor.setProgress(0.0);
 
@@ -66,7 +84,6 @@ public class ImportTask extends AbstractTask {
         String networkName = optionsPanel.getNetworkName();
         logger.info("The entered name of the new network by user: " + networkName);
 
-//        Boolean concise = false;
         Boolean concise = optionsPanel.conciseVersion();
         logger.info("The option selected for concise: " + concise);
         payload.put("nodes", nodes);
@@ -86,8 +103,6 @@ public class ImportTask extends AbstractTask {
 
         logger.info("The post JSON converted to string: " + payload.toString());
 
-
-//        HttpPost post = new HttpPost("https://api.repotrial.net/graph_builder");
         HttpPost post = new HttpPost(Constant.API_LINK+ "graph_builder");
         HttpClient client = new DefaultHttpClient();
 
@@ -188,5 +203,12 @@ public class ImportTask extends AbstractTask {
             // TODO Auto-generated catch block
             e2.printStackTrace();
         }
+    	}
+        
+        else if (!agreementStatus) {
+			logger.info("The use of NeDRex app is only allowed upon agreeing with the NeDRex Terms of Use available at: https://api.nedrex.net/static/licence");
+			showWarningTime();
+			taskMonitor.showMessage(Level.WARN, "If you want to use the NeDRex app, please agree with our terms of use. The use of NeDRex app is only allowed upon agreeing with the NeDRex Terms of Use available at: https://api.nedrex.net/static/licence");
+		}
     }
 }
