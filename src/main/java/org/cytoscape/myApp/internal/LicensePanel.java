@@ -52,28 +52,9 @@ public class LicensePanel extends JPanel{
         infoPanel.setBackground(Color.WHITE);
         add(infoPanel);
         infoPanel.setLayout(new BorderLayout()); 
-//        topPanel = new JPanel();
-//        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.PAGE_AXIS));
-//        topPanel.setBackground(Color.WHITE);
-//        leftPanel = new JPanel();
-//        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.PAGE_AXIS));
-//        leftPanel.setBackground(Color.WHITE);
-//        centerPanel = new JPanel();
-//        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.PAGE_AXIS));
-//        centerPanel.setBackground(Color.WHITE);
-//        rightPanel = new JPanel();
-//        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.PAGE_AXIS));
-//        rightPanel.setBackground(Color.WHITE);
-//        makeURIs();
 	}
 	
     private void makePanel() throws IOException{
-
-        /*JLabel agreementLabel = new JLabel("License Agreement!");
-        agreementLabel.setFont(new Font("Helvetica", Font.PLAIN, 24));
-        agreementLabel.setForeground(new Color(20, 62, 130));
-        agreementLabel.setBorder(new EmptyBorder(10,170,10,170));
-        infoPanel.add(agreementLabel);*/
 
         String licenceURL = Constant.API_LINK + "static/licence";
 

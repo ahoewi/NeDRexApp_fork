@@ -67,6 +67,7 @@ public class AboutPanel extends JPanel {
     URI ncbiLicense;
     String ncbiDate;
     URI tutorialURI;
+    URI citationURI;
     URI nedrexURI;
 //    URI interproURI;
 //    URI interproLicense;
@@ -116,6 +117,7 @@ public class AboutPanel extends JPanel {
             this.ncbiURI = new URI("https://www.ncbi.nlm.nih.gov/");
             this.ncbiLicense = new URI("https://www.ncbi.nlm.nih.gov/home/about/policies/");
             this.tutorialURI = new URI(Constant.TUTORIAL_LINK);
+            this.citationURI = new URI(Constant.CITATION_LINK);
             this.nedrexURI = new URI(Constant.NEDREX_LINK);
 //            this.interproURI = new URI("https://www.ebi.ac.uk/interpro/");
 //            this.interproLicense = new URI("https://www.ebi.ac.uk/interpro/about/interpro/");
@@ -186,6 +188,12 @@ public class AboutPanel extends JPanel {
             tutorialLabel.setFont(new Font("Helvetica", Font.PLAIN, 14));
             topPanel.add(tutorialLabel);            
             addButton("https://nedrex.net/tutorial", tutorialURI, topPanel);
+            
+            JLabel citationLabel = new JLabel("<html> <b>Citation:</b> If you use NeDRex app in your research, please cite our paper: </html>");
+            citationLabel.setBorder(new EmptyBorder(10,10,1,10));
+            citationLabel.setFont(new Font("Helvetica", Font.PLAIN, 14));
+            topPanel.add(citationLabel);            
+            addButton("https://www.nature.com/articles/s41467-021-27138-2", citationURI, topPanel);
             
             JLabel databaseLabel = new JLabel("<html> The current version of the <b>NeDRexDB</b> (" + repoTrialDBVersion+") uses " + "the following versions of databases: </html>");
             databaseLabel.setBorder(new EmptyBorder(10,10,1,10));
