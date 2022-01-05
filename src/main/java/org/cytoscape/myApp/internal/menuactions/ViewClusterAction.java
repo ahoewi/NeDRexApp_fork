@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
  * NeDRex App
  * @author Sepideh Sadegh
  */
+// not used in the current version
 public class ViewClusterAction extends AbstractCyAction{
 	private RepoApplication app;
 	private Logger logger = LoggerFactory.getLogger(getClass());

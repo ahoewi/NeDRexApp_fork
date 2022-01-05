@@ -9,6 +9,7 @@ import org.cytoscape.myApp.internal.RepoApplication;
 import org.cytoscape.myApp.internal.RepoResultPanel;
 import org.cytoscape.myApp.internal.tasks.JointValidationTask;
 import org.cytoscape.myApp.internal.tasks.MechBasedValidTask;
+import org.cytoscape.myApp.internal.utils.WarningMessages;
 import org.cytoscape.work.TaskIterator;
 import org.cytoscape.work.swing.DialogTaskManager;
 import org.slf4j.Logger;
@@ -39,7 +40,7 @@ public class JointValidationAction extends AbstractCyAction{
 				"a) run one of the disease module identification and one of the drug prioritization functions,<br> " +
 				"   in a sequence, and the returned subnetwork (including the module and drugs) is open;<br>" +
 				"b) a list of drugs indicated for the treatment of the disease to be used as reference true drugs.<br><br></body></html>";
-		this.infoBox = new InfoBox(app, message, Constant.TUTORIAL_LINK+"availableFunctions.html#joint-module-drugs");
+		this.infoBox = new InfoBox(app, message, Constant.TUTORIAL_LINK+"availableFunctions.html#joint-module-drugs", true);
 		putValue(SHORT_DESCRIPTION, "A statistical method to jointly validate the disease module and the drug candidates returned by NeDRex repurposing approach.");
 	}
 
@@ -47,7 +48,7 @@ public class JointValidationAction extends AbstractCyAction{
 	public void actionPerformed(ActionEvent e) {
 		if(!infoBox.isHide()) {
 			int returnedValue = infoBox.showMessage();
-			if (returnedValue == 0) {
+			if (returnedValue == 0 && infoBox.getLicensbox().isSelected()) {
 				//Continue
 				DialogTaskManager taskmanager = app.getActivator().getService(DialogTaskManager.class);
 				taskmanager.execute(new TaskIterator(new JointValidationTask(app, resultPanel)));
@@ -55,6 +56,9 @@ public class JointValidationAction extends AbstractCyAction{
 					//Don't show this again
 					infoBox.setHide(true);
 				}
+			}
+			else if (returnedValue == 0 && !infoBox.getLicensbox().isSelected()) {
+				WarningMessages.showAgreementWarning();
 			}
 
 		}else{

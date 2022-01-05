@@ -7,6 +7,7 @@ import org.cytoscape.myApp.internal.Constant;
 import org.cytoscape.myApp.internal.InfoBox;
 import org.cytoscape.myApp.internal.RepoApplication;
 import org.cytoscape.myApp.internal.tasks.QuickStartTask;
+import org.cytoscape.myApp.internal.utils.WarningMessages;
 import org.cytoscape.work.TaskIterator;
 import org.cytoscape.work.swing.DialogTaskManager;
 /**
@@ -33,7 +34,7 @@ public class QuickStartAction extends AbstractCyAction{
 				"Starting point: <br>" +
 				"Selected disorder(s) in the network." +
 				"<br><br></body></html>";
-		this.infoBox = new InfoBox(app, message, Constant.TUTORIAL_LINK+"availableFunctions.html#quick-start-with-drug-repurposing");
+		this.infoBox = new InfoBox(app, message, Constant.TUTORIAL_LINK+"availableFunctions.html#quick-start-with-drug-repurposing", true);
 		putValue(SHORT_DESCRIPTION, "To quickly find potential repurposable drugs for the selected diseases in the network, with one click Quick Start performs all main steps of the workflow (1. Get disease associated genes; 2. Run Disease Module Identification; 3. Run Drug Prioritization");
 	}
 
@@ -41,7 +42,7 @@ public class QuickStartAction extends AbstractCyAction{
 	public void actionPerformed(ActionEvent e) {
 		if (!infoBox.isHide()) {
 			int returnedValue = infoBox.showMessage();
-			if (returnedValue == 0) {
+			if (returnedValue == 0 && infoBox.getLicensbox().isSelected()) {
 				//Continue
 				DialogTaskManager taskmanager = app.getActivator().getService(DialogTaskManager.class);
 				taskmanager.execute(new TaskIterator(new QuickStartTask(app)));
@@ -49,6 +50,9 @@ public class QuickStartAction extends AbstractCyAction{
 					//Don't show this again
 					infoBox.setHide(true);
 				}
+			}
+			else if (returnedValue == 0 && !infoBox.getLicensbox().isSelected()) {
+				WarningMessages.showAgreementWarning();
 			}
 		}else {
 			DialogTaskManager taskmanager = app.getActivator().getService(DialogTaskManager.class);

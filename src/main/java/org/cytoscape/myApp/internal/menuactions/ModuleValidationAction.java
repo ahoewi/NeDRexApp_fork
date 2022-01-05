@@ -8,6 +8,7 @@ import org.cytoscape.myApp.internal.InfoBox;
 import org.cytoscape.myApp.internal.RepoApplication;
 import org.cytoscape.myApp.internal.RepoResultPanel;
 import org.cytoscape.myApp.internal.tasks.ModuleValidationTask;
+import org.cytoscape.myApp.internal.utils.WarningMessages;
 import org.cytoscape.work.TaskIterator;
 import org.cytoscape.work.swing.DialogTaskManager;
 import org.slf4j.Logger;
@@ -41,7 +42,7 @@ public class ModuleValidationAction extends AbstractCyAction{
 				"Before continuing with this function, make sure you have:<br>" +
 				"a) run one of the disease module identification functions and the returned subnetwork is open;<br> " +
 				"b) a list of drugs indicated for the treatment of the disease to be used as reference true drugs.<br><br></body></html>";
-		this.infoBox = new InfoBox(app, message, Constant.TUTORIAL_LINK+"availableFunctions.html#disease-module");
+		this.infoBox = new InfoBox(app, message, Constant.TUTORIAL_LINK+"availableFunctions.html#disease-module", true);
 		putValue(SHORT_DESCRIPTION, "A statistical method to jointly validate the disease module returned by NeDRex repurposing approach.");
 	}
 
@@ -49,7 +50,7 @@ public class ModuleValidationAction extends AbstractCyAction{
 	public void actionPerformed(ActionEvent e) {
 		if(!infoBox.isHide()) {
 			int returnedValue = infoBox.showMessage();
-			if (returnedValue == 0) {
+			if (returnedValue == 0 && infoBox.getLicensbox().isSelected()) {
 				//Continue
 				DialogTaskManager taskmanager = app.getActivator().getService(DialogTaskManager.class);
 				taskmanager.execute(new TaskIterator(new ModuleValidationTask(app, resultPanel)));
@@ -57,6 +58,9 @@ public class ModuleValidationAction extends AbstractCyAction{
 					//Don't show this again
 					infoBox.setHide(true);
 				}
+			}
+			else if (returnedValue == 0 && !infoBox.getLicensbox().isSelected()) {
+				WarningMessages.showAgreementWarning();
 			}
 
 		}else{

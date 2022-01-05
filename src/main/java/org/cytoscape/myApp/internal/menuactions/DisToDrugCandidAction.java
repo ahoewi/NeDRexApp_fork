@@ -7,6 +7,7 @@ import org.cytoscape.myApp.internal.Constant;
 import org.cytoscape.myApp.internal.InfoBox;
 import org.cytoscape.myApp.internal.RepoApplication;
 import org.cytoscape.myApp.internal.tasks.DisToDrugCandidTask;
+import org.cytoscape.myApp.internal.utils.WarningMessages;
 import org.cytoscape.work.TaskIterator;
 import org.cytoscape.work.swing.DialogTaskManager;
 import org.slf4j.Logger;
@@ -33,8 +34,8 @@ public class DisToDrugCandidAction extends AbstractCyAction{
 				"A network with at least Gene-Disorder, Gene-Protein, Protein-Protein and Drug-Protein association types.<br>"
 				+ "Starting point: <br>"
 				+ "Selected disorder(s) in the network."
-				+ "<br><br><br></body></html>";
-		this.infoBox = new InfoBox(app, message, Constant.TUTORIAL_LINK+"availableFunctions.html#start-with-disease-drugs");
+				+ "<br><br></body></html>";
+		this.infoBox = new InfoBox(app, message, Constant.TUTORIAL_LINK+"availableFunctions.html#start-with-disease-drugs", true);
 		putValue(SHORT_DESCRIPTION,"Starting with a set of selected diseases, Disease->Gene->Protein->Drug paths in the network will be returned. There's an option to run Steiner tree on the intermediate genes/proteins to expand the exploration.");
 	}
 
@@ -42,7 +43,7 @@ public class DisToDrugCandidAction extends AbstractCyAction{
 	public void actionPerformed(ActionEvent e) {
 		if (!infoBox.isHide()) {
 			int returnedValue = infoBox.showMessage();
-			if (returnedValue == 0) {
+			if (returnedValue == 0 && infoBox.getLicensbox().isSelected()) {
 				//Continue
 				DialogTaskManager taskmanager = app.getActivator().getService(DialogTaskManager.class);
 				taskmanager.execute(new TaskIterator(new DisToDrugCandidTask(app)));
@@ -50,6 +51,9 @@ public class DisToDrugCandidAction extends AbstractCyAction{
 					//Don't show this again
 					infoBox.setHide(true);
 				}
+			}
+			else if (returnedValue == 0 && !infoBox.getLicensbox().isSelected()) {
+				WarningMessages.showAgreementWarning();
 			}
 		}else {
 			DialogTaskManager taskmanager = app.getActivator().getService(DialogTaskManager.class);

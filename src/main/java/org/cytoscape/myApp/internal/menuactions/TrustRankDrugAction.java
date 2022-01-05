@@ -7,6 +7,7 @@ import org.cytoscape.myApp.internal.Constant;
 import org.cytoscape.myApp.internal.InfoBox;
 import org.cytoscape.myApp.internal.RepoApplication;
 import org.cytoscape.myApp.internal.tasks.TrustRankDrugTask;
+import org.cytoscape.myApp.internal.utils.WarningMessages;
 import org.cytoscape.work.TaskIterator;
 import org.cytoscape.work.swing.DialogTaskManager;
 /**
@@ -31,7 +32,7 @@ public class TrustRankDrugAction extends AbstractCyAction{
 				"a) selected either all genes/proteins in a returned disease module or a subset of them or;<br>"
 				+"b) selected genes/proteins which you are interested to rank drugs targeting them."
 				+ "<br><br></body></html>";
-		this.infoBox = new InfoBox(app, message, "Gyöngyi et al.", "https://www.vldb.org/conf/2004/RS15P3.PDF", Constant.TUTORIAL_LINK+"availableFunctions.html#rank-drugs-with-trustrank");
+		this.infoBox = new InfoBox(app, message, "Gyöngyi et al.", "https://www.vldb.org/conf/2004/RS15P3.PDF", Constant.TUTORIAL_LINK+"availableFunctions.html#rank-drugs-with-trustrank", true);
 		putValue(SHORT_DESCRIPTION,"TrustRank ranks nodes in a network based on how well they are connected to a (trusted) set of seed nodes. It is a modification of Google’s PageRank algorithm, where “trust” is iteratively propagated from seed nodes to adjacent nodes using the network topology.");
 	}
 
@@ -39,7 +40,7 @@ public class TrustRankDrugAction extends AbstractCyAction{
 	public void actionPerformed(ActionEvent e) {
 		if (!infoBox.isHide()) {
 			int returnedValue = infoBox.showMessage();
-			if (returnedValue == 0) {
+			if (returnedValue == 0 && infoBox.getLicensbox().isSelected()) {
 				//Continue
 				DialogTaskManager taskmanager = app.getActivator().getService(DialogTaskManager.class);
 				taskmanager.execute(new TaskIterator(new TrustRankDrugTask(app)));
@@ -47,6 +48,9 @@ public class TrustRankDrugAction extends AbstractCyAction{
 					//Don't show this again
 					infoBox.setHide(true);
 				}
+			}
+			else if (returnedValue == 0 && !infoBox.getLicensbox().isSelected()) {
+				WarningMessages.showAgreementWarning();
 			}
 		} else {
 			DialogTaskManager taskmanager = app.getActivator().getService(DialogTaskManager.class);

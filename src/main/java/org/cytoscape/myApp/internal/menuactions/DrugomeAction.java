@@ -2,11 +2,15 @@ package org.cytoscape.myApp.internal.menuactions;
 
 import java.awt.event.ActionEvent;
 
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
 import org.cytoscape.application.swing.AbstractCyAction;
 import org.cytoscape.myApp.internal.Constant;
 import org.cytoscape.myApp.internal.InfoBox;
 import org.cytoscape.myApp.internal.RepoApplication;
 import org.cytoscape.myApp.internal.tasks.DrugomeTask;
+import org.cytoscape.myApp.internal.utils.WarningMessages;
 import org.cytoscape.work.TaskIterator;
 import org.cytoscape.work.swing.DialogTaskManager;
 import org.slf4j.Logger;
@@ -32,16 +36,17 @@ public class DrugomeAction extends AbstractCyAction{
 				"Required imported network from NeDRexDB:<br>" +
 				"For the projected network based on shared indication, a network with at least Drug-Disorder association type.<br>"
 				+ "For the projected network based on shared targets, a network with at least Drug-Protein association type.<br>"			
-				+ "<br><br></body></html>";
-		this.infoBox = new InfoBox(app, message, Constant.TUTORIAL_LINK+"availableFunctions.html#drugome");
+				+ "<br></body></html>";
+		this.infoBox = new InfoBox(app, message, Constant.TUTORIAL_LINK+"availableFunctions.html#drugome", true);
 		putValue(SHORT_DESCRIPTION,"Creates a Drug-Drug projection of the heterogeneous network based on either shared indications (diseases) or shared targets between drugs.");
 	}
+	
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (!infoBox.isHide()) {
 			int returnedValue = infoBox.showMessage();
-			if (returnedValue == 0) {
+			if (returnedValue == 0 && infoBox.getLicensbox().isSelected()) {
 				//Continue
 				DialogTaskManager taskmanager = app.getActivator().getService(DialogTaskManager.class);
 				taskmanager.execute(new TaskIterator(new DrugomeTask(app)));
@@ -49,6 +54,9 @@ public class DrugomeAction extends AbstractCyAction{
 					//Don't show this again
 					infoBox.setHide(true);
 				}
+			}
+			else if (returnedValue == 0 && !infoBox.getLicensbox().isSelected()) {
+				WarningMessages.showAgreementWarning();
 			}
 		}else {
 			DialogTaskManager taskmanager = app.getActivator().getService(DialogTaskManager.class);

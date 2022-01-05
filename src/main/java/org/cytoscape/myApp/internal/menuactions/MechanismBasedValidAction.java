@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
  * NeDRex App
  * @author Sepideh Sadegh
  */
+// Not used in the current version
 public class MechanismBasedValidAction extends AbstractCyAction{
 	private RepoApplication app;
 	private Logger logger = LoggerFactory.getLogger(getClass());
