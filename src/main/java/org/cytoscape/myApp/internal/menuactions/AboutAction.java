@@ -9,7 +9,7 @@ import java.awt.event.ActionEvent;
 
 /**
  * NeDRex App
- * @author Judith Bernett
+ * @author Judith Bernett, Sepideh Sadegh
  */
 public class AboutAction extends AbstractCyAction {
     RepoApplication app;

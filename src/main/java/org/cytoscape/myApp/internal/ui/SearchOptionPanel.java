@@ -31,13 +31,13 @@ public class SearchOptionPanel extends JPanel{
 	
 	JPanel edgeOptions;
 	JCheckBox edgeTypeGD, edgeTypeGP, edgeTypePP, edgeTypeDrP, edgeTypeDrDis, edgeTypeDD, edgeTypePwP;
-	JCheckBox agreed, approved, experimental, illicit, investig, nutraceu, vetApprov, withdrawn; 
+	JCheckBox agreed, approved, experimental, illicit, investig, nutraceu, vetApprov, withdrawn;
+	JComboBox<String> taxid;
 	JCheckBox selfLoop;
 	JCheckBox iidEvid;
 	JCheckBox omim;
 	JCheckBox disgenet;
 	JCheckBox concise;
-	JComboBox<String> taxid;
 	JSlider disgenetScore;
 	JTextField scoreField;
 	JTextField newNetworkName;
@@ -52,7 +52,7 @@ public class SearchOptionPanel extends JPanel{
 		setPreferredSize(new Dimension(725,200));
 		EasyGBC c = new EasyGBC();
 		
-		// Add some options
+		// Edge choices to add
 		edgeOptions = createEdgeOptions();
 		add(edgeOptions, c.down().expandBoth().insets(5,5,0,5));
 		
@@ -96,10 +96,15 @@ public class SearchOptionPanel extends JPanel{
 		edgeOptionPanel.add(edgeTypePP, c);
 		edgeTypePP.setToolTipText("Protein protein interactions");
 		
-		c.right().noExpand().insets(0,10,0,5);
-		edgeTypeDrP = new JCheckBox("Drug-Protein", true);
-		edgeOptionPanel.add(edgeTypeDrP, c);
-		edgeTypeDrP.setToolTipText("Relationships between drugs and proteins targeted by them");
+//		c.right().noExpand().insets(0,10,0,5);
+//		edgeTypeDrP = new JCheckBox("Drug-Protein", true);
+//		edgeOptionPanel.add(edgeTypeDrP, c);
+//		edgeTypeDrP.setToolTipText("Relationships between drugs and proteins targeted by them");
+		
+		c.right().expandHoriz().insets(0,10,0,5);
+		edgeTypeDD = new JCheckBox("Disorder-Disorder (hierarchy)", false);
+		edgeOptionPanel.add(edgeTypeDD, c);
+		edgeTypeDD.setToolTipText("Relationships representing the disorder hierarchy in MONDO");
 		
 		c.down().expandHoriz().insets(0,10,0,5);
 		JLabel dummy = new JLabel("");
@@ -115,10 +120,15 @@ public class SearchOptionPanel extends JPanel{
 		edgeOptionPanel.add(edgeTypeDrDis, c);
 		edgeTypeDrDis.setToolTipText("Relationships between disorders and the drugs that are indicated for the treatment of disorders");
 		
+//		c.right().expandHoriz().insets(0,10,0,5);
+//		edgeTypeDD = new JCheckBox("Disorder-Disorder (hierarchy)", false);
+//		edgeOptionPanel.add(edgeTypeDD, c);
+//		edgeTypeDD.setToolTipText("Relationships representing the disorder hierarchy in MONDO");
+		
 		c.right().expandHoriz().insets(0,10,0,5);
-		edgeTypeDD = new JCheckBox("Disorder-Disorder", false);
-		edgeOptionPanel.add(edgeTypeDD, c);
-		edgeTypeDD.setToolTipText("Relationships representing the disorder hierarchy in MONDO");
+		edgeTypeDrP = new JCheckBox("Drug-Protein", true);
+		edgeOptionPanel.add(edgeTypeDrP, c);
+		edgeTypeDrP.setToolTipText("Relationships between drugs and proteins targeted by them");
 		
 		return edgeOptionPanel;
 	}
@@ -541,7 +551,7 @@ public class SearchOptionPanel extends JPanel{
 		
 		return selInteractionType;
 	}
-	/// use this one 
+	/// use this one if necessary (it is not used, though)
 	public List<String> getSelectedNodeTypes() {
 		List<InteractionType> selIntTypes = getSelectedInteractionTypes();
 		Set<String> selNodeTypeSet = new HashSet<String>();

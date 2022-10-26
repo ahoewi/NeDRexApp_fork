@@ -185,6 +185,10 @@ public class RepoApplication {
 		return getApplicationManager().getCurrentNetwork();
 	}
 	
+	public void deselectCurrentNetwork() {		
+		getApplicationManager().setCurrentNetwork(null);
+	}
+	
 	public CyNetworkView getCurrentNetworkView() {
 		return getApplicationManager().getCurrentNetworkView();
 	}

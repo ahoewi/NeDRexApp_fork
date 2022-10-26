@@ -103,7 +103,7 @@ public class AboutPanel extends JPanel {
             this.uniprotLicense = new URI("https://www.uniprot.org/help/license");
             this.omimURI = new URI("https://omim.org/");
             this.omimLicense = new URI("https://www.omim.org/help/agreement");
-            this.iidURI = new URI("https://www.accessdata.fda.gov/scripts/cder/iig/index.Cfm");
+            this.iidURI = new URI("http://iid.ophid.utoronto.ca/");
             this.iidLicense = new URI("https://www.fda.gov/media/128687/download");
             this.reactomeURI = new URI("https://reactome.org/");
             this.reactomeLicense = new URI("https://reactome.org/license");

@@ -4,6 +4,7 @@ import java.util.Properties;
 
 import org.cytoscape.myApp.internal.tasks.DeselectSingleNodeTaskFactory;
 import org.cytoscape.myApp.internal.tasks.OpenEntryInDBTaskFactory;
+import org.cytoscape.myApp.internal.ui.ComorbiditomeWebServiceClient;
 import org.cytoscape.myApp.internal.ui.RepoTrialDBWebServiceClient;
 import org.cytoscape.service.util.AbstractCyActivator;
 import org.cytoscape.service.util.CyServiceRegistrar;
@@ -38,9 +39,12 @@ public class CyActivator extends AbstractCyActivator {
 		RepoApplication app = this.getService(RepoApplication.class);
 		
 		{
-			// Register our web service client
+			// Register our web service clients
 			RepoTrialDBWebServiceClient client = new RepoTrialDBWebServiceClient(app);
 			registerAllServices(context, client, new Properties());
+			
+			ComorbiditomeWebServiceClient comorbClient = new ComorbiditomeWebServiceClient(app);
+			registerAllServices(context, comorbClient, new Properties());
 		}
 		final OpenEntryInDBTaskFactory openEntryInDBTaskFactory = new OpenEntryInDBTaskFactory();
 		final Properties openProp = new Properties();

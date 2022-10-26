@@ -65,7 +65,7 @@ public class GetNetworkPanel extends JPanel{
 	
 	private void init() {
 		// Create the surrounding panel
-		setPreferredSize(new Dimension(800,400)); // use 800, 600 after adding Enter ID panel
+		setPreferredSize(new Dimension(850,400));
 		EasyGBC c = new EasyGBC();
 
 		optionsPanel = new SearchOptionPanel(app);
@@ -120,7 +120,7 @@ public class GetNetworkPanel extends JPanel{
 		return buttonPanel;
 	}
 	
-	// this function is not used now
+	// this function is not used now >> see ImportAction in line 111
 	class InitialAction extends AbstractAction {
 		public InitialAction() {
 			super("Import");
