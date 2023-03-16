@@ -103,7 +103,7 @@ public class ImportComorbidTask extends AbstractTask{
         
         app.deselectCurrentNetwork();
 
-        HttpPost post = new HttpPost(Constant.Dev_API_LINK+ "comorbiditome/submit_comorbiditome_build");
+        HttpPost post = new HttpPost(Constant.API_LINK+ "comorbiditome/submit_comorbiditome_build");
         HttpClient client = new DefaultHttpClient();
 
         post.setEntity(new StringEntity(payload.toString(), ContentType.APPLICATION_JSON));
@@ -137,7 +137,7 @@ public class ImportComorbidTask extends AbstractTask{
         String uid = uidd.replace("\"", "");
 //        HttpGet request = new HttpGet(Constant.Dev_API_LINK+"comorbiditome/comorbiditome_build_status"+uid); // uid is the query parameter here (different than graph build. Modify this line  
         
-        HttpGet request = new HttpGet(Constant.Dev_API_LINK+"comorbiditome/comorbiditome_build_status");
+        HttpGet request = new HttpGet(Constant.API_LINK+"comorbiditome/comorbiditome_build_status");
 //		HttpClient client2 = new DefaultHttpClient();
 		URI uri = new URIBuilder(request.getURI()).addParameter("uid", uid).build();
 		((HttpRequestBase) request).setURI(uri);
@@ -172,10 +172,10 @@ public class ImportComorbidTask extends AbstractTask{
                     logger.info("The built was successful!");
                     String urlp = "";
                     if (!networkName.equals("")) {
-                        urlp = Constant.Dev_API_LINK+"comorbiditome/download_comorbiditome_build/"+uid+"/graphml/"+networkName+".graphml";                        
+                        urlp = Constant.API_LINK+"comorbiditome/download_comorbiditome_build/"+uid+"/graphml/"+networkName+".graphml";
                     }
                     else {
-                    	urlp = Constant.Dev_API_LINK+"comorbiditome/download_comorbiditome_build/"+uid+"/graphml/"+uid.toString()+".graphml";
+                    	urlp = Constant.API_LINK+"comorbiditome/download_comorbiditome_build/"+uid+"/graphml/"+uid.toString()+".graphml";
                         
                     }
 
