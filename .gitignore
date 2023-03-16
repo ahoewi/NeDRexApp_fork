@@ -7,3 +7,4 @@ resources/*
 .settings/*
 .classpath
 .project
+.idea
