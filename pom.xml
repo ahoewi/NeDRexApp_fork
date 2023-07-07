@@ -4,7 +4,7 @@
 	<properties>
 		<bundle.symbolicName>org.cytoscape.nedrex.NeDRex</bundle.symbolicName>
 		<bundle.namespace>org.cytoscape.nedrex</bundle.namespace>
-		<cytoscape-dependency-version>3.6.1</cytoscape-dependency-version>
+		<cytoscape-dependency-version>3.8.0</cytoscape-dependency-version>
 	</properties>
 
 	<modelVersion>4.0.0</modelVersion>

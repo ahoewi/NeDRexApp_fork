@@ -82,12 +82,12 @@ public class ComorbOptionPanel extends JPanel{
 		phicorMin.setMinorTickSpacing(2);
 		phicorMin.setPaintTicks(true);
 	    java.util.Hashtable<Integer,JLabel> labelTable = new java.util.Hashtable<Integer,JLabel>();
-	    labelTable.put(new Integer(50), new JLabel("0.5"));
-	    labelTable.put(new Integer(40), new JLabel("0.4"));
-	    labelTable.put(new Integer(30), new JLabel("0.3"));
-	    labelTable.put(new Integer(20), new JLabel("0.2"));
-	    labelTable.put(new Integer(10), new JLabel("0.1"));
-	    labelTable.put(new Integer(0), new JLabel("0.0"));
+	    labelTable.put(50, new JLabel("0.5"));
+	    labelTable.put(40, new JLabel("0.4"));
+	    labelTable.put(30, new JLabel("0.3"));
+	    labelTable.put(20, new JLabel("0.2"));
+	    labelTable.put(10, new JLabel("0.1"));
+	    labelTable.put(0, new JLabel("0.0"));
 	    phicorMin.setLabelTable(labelTable);
 	    phicorMin.setPaintLabels(true);
 
