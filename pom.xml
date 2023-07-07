@@ -2,14 +2,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<properties>
-		<bundle.symbolicName>org.cytoscape.myApp.NeDRex</bundle.symbolicName>
-		<bundle.namespace>org.cytoscape.myApp</bundle.namespace>
+		<bundle.symbolicName>org.cytoscape.nedrex.NeDRex</bundle.symbolicName>
+		<bundle.namespace>org.cytoscape.nedrex</bundle.namespace>
+		<cytoscape-dependency-version>3.6.1</cytoscape-dependency-version>
 	</properties>
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.cytoscape.myApp</groupId>
+	<groupId>org.cytoscape.nedrex</groupId>
 	<artifactId>NeDRex</artifactId>
-	<version>2.0.0-rc1</version>
+	<version>2.0.0-rc2</version>
 	<name>NeDRex</name>
 	<packaging>bundle</packaging>
 
@@ -70,17 +71,13 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
+						<_dsannotations>*</_dsannotations>
 						<Bundle-SymbolicName>${bundle.symbolicName}</Bundle-SymbolicName>
 						<Bundle-Version>${project.version}</Bundle-Version>
 						<Export-Package>${bundle.namespace}</Export-Package>
 						<Private-Package>${bundle.namespace}.internal.*</Private-Package>
 						<Bundle-Activator>${bundle.namespace}.internal.CyActivator</Bundle-Activator>
-<!-- 						<Embed-Dependency>commons-math3;scope=compile|runtime</Embed-Dependency> -->
-<!-- 						<Embed-Dependency>jgrapht-core;scope=compile|runtime</Embed-Dependency> -->
-						<!-- some dependencies must be embeded here, e.g. jgrapht and math3! -->
 						<Embed-Dependency>*;scope=compile|runtime;groupId=!org.cytoscape|org.osgi</Embed-Dependency>
-<!-- 						<Embed-Dependency>*;scope=!provided|!test</Embed-Dependency> -->
-<!-- 						<Embed-Dependency>*;scope=!provided|test;groupId=!org.cytoscape</Embed-Dependency> -->
 					</instructions>
 				</configuration>
 			</plugin>
@@ -128,49 +125,59 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.osgi</groupId>
-			<artifactId>org.osgi.core</artifactId>
-			<version>4.2.0</version>
+			<artifactId>osgi.core</artifactId>
+			<version>6.0.0</version>
 		</dependency>
-		
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.scr</artifactId>
+			<version>2.2.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>osgi.cmpn</artifactId>
+			<version>6.0.0</version>
+			<scope>provided</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.cytoscape</groupId>
 			<artifactId>service-api</artifactId>
-			<version>3.6.1</version>
+			<version>${cytoscape-dependency-version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.cytoscape</groupId>
 			<artifactId>swing-application-api</artifactId>
-			<version>3.6.1</version>
+			<version>${cytoscape-dependency-version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.cytoscape</groupId>
 			<artifactId>session-api</artifactId>
-			<version>3.6.1</version>
+			<version>${cytoscape-dependency-version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.cytoscape</groupId>
 			<artifactId>core-task-api</artifactId>
-			<version>3.6.1</version>
+			<version>${cytoscape-dependency-version}</version>
 		</dependency>
 		<dependency>
     		<groupId>org.cytoscape</groupId>
    			<artifactId>command-executor-api</artifactId>
-   			<version>3.6.1</version>
+   			<version>${cytoscape-dependency-version}</version>
 		</dependency>
 		<dependency>
    			<groupId>org.cytoscape</groupId>
     		<artifactId>work-api</artifactId>
-    		<version>3.6.1</version>
+    		<version>${cytoscape-dependency-version}</version>
 		</dependency>
 		<dependency>
     		<groupId>org.cytoscape</groupId>
     		<artifactId>webservice-swing-api</artifactId>
-    		<version>3.6.1</version>
+    		<version>${cytoscape-dependency-version}</version>
 		</dependency>
 		<dependency>
     		<groupId>org.cytoscape</groupId>
     		<artifactId>layout-api</artifactId>
-    		<version>3.6.1</version>
+    		<version>${cytoscape-dependency-version}</version>
 		</dependency>
 
 		<!-- Logging -->
@@ -183,7 +190,7 @@
 		<dependency>
 			<groupId>org.ops4j.pax.logging</groupId>
 			<artifactId>pax-logging-service</artifactId>
-			<version>1.5.3</version>
+			<version>1.11.17</version>
 			<scope>provided</scope>
 		</dependency>
 		<!-- jgrapht -->
@@ -205,27 +212,26 @@
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
-			<version>4.2</version>
+			<version>4.2.3</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
   			<groupId>org.apache.httpcomponents</groupId>
   			<artifactId>httpmime</artifactId>
-  			<version>4.2</version>
+  			<version>4.2.3</version>
 		</dependency>
 		<dependency>
     		<groupId>commons-io</groupId>
    			<artifactId>commons-io</artifactId>
-    		<version>2.6</version>
+    		<version>2.7</version>
     		<optional>true</optional>
 		</dependency>
-<!-- Math: https://mvnrepository.com/artifact/org.apache.commons/commons-math3 -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>
 			<version>3.6.1</version>
 			<optional>true</optional>
-		</dependency>		
+		</dependency>
 	</dependencies>
 
 </project>
