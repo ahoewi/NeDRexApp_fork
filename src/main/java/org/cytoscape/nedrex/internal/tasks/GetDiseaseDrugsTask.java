@@ -1,21 +1,10 @@
 package org.cytoscape.nedrex.internal.tasks;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
-
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyTableUtil;
-import org.cytoscape.nedrex.internal.CommandExecuter;
-import org.cytoscape.nedrex.internal.InteractionType;
-import org.cytoscape.nedrex.internal.ModelUtil;
-import org.cytoscape.nedrex.internal.NodeType;
-import org.cytoscape.nedrex.internal.RepoApplication;
+import org.cytoscape.nedrex.internal.*;
 import org.cytoscape.nedrex.internal.utils.ApiRoutesUtil;
 import org.cytoscape.nedrex.internal.utils.FilterType;
 import org.cytoscape.session.CyNetworkNaming;
@@ -23,13 +12,15 @@ import org.cytoscape.work.AbstractTask;
 import org.cytoscape.work.ProvidesTitle;
 import org.cytoscape.work.TaskMonitor;
 import org.cytoscape.work.Tunable;
-import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
+import java.util.Map.Entry;
 /**
  * NeDRex App
  * @author Sepideh Sadegh
- * @modified by: Andreas Maier
+ * @author Andreas Maier
  */
 public class GetDiseaseDrugsTask extends AbstractTask{
 	
@@ -53,18 +44,10 @@ public class GetDiseaseDrugsTask extends AbstractTask{
 	
 	public GetDiseaseDrugsTask (RepoApplication app) {
 		this.app = app;
+		this.apiUtils = app.getApiRoutesUtil();
 	}
 
 	private ApiRoutesUtil apiUtils;
-	@Reference
-	public void setAPIUtils(ApiRoutesUtil apiUtils) {
-		this.apiUtils = apiUtils;
-	}
-
-	public void unsetAPIUtils(ApiRoutesUtil apiUtils) {
-		if (this.apiUtils == apiUtils)
-			this.apiUtils = null;
-	}
 
 	@Override
 	public void run(TaskMonitor taskMonitor) throws Exception {

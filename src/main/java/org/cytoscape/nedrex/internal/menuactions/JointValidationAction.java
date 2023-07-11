@@ -18,7 +18,7 @@ import java.awt.event.ActionEvent;
 /**
  * NeDRex App
  * @author Sepideh Sadegh
- * @modified by: Andreas Maier
+ * @author Andreas Maier
  */
 public class JointValidationAction extends AbstractCyAction{
 	private RepoApplication app;

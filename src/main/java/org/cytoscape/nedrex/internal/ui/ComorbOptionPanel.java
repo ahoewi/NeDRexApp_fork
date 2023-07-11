@@ -19,7 +19,7 @@ import org.cytoscape.nedrex.internal.RepoApplication;
 /**
  * NeDRex App
  * @author Sepideh Sadegh
- * @modified by: Andreas Maier
+ * @author Andreas Maier
  */
 public class ComorbOptionPanel extends JPanel{
 	

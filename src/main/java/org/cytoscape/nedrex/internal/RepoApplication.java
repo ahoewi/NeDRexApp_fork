@@ -5,6 +5,7 @@ import org.cytoscape.application.swing.CySwingApplication;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNetworkManager;
 import org.cytoscape.nedrex.internal.menuactions.*;
+import org.cytoscape.nedrex.internal.utils.ApiRoutesUtil;
 import org.cytoscape.view.layout.CyLayoutAlgorithmManager;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.CyNetworkViewManager;
@@ -38,8 +39,14 @@ public class RepoApplication {
 	private JDialog quickSelectDialog2;
 	private QuickSelectPanel2 quickSelectPanel2;
 
-	public RepoApplication(CyActivator activator) {
+	private NeDRexService nedrexService;
+
+	private ApiRoutesUtil apiRoutesUtil;
+
+	public RepoApplication(CyActivator activator, NeDRexService nedrexService, ApiRoutesUtil apiRoutesUtil) {
 		this.activator = activator;
+		this.nedrexService = nedrexService;
+		this.apiRoutesUtil = apiRoutesUtil;
 		this.application = activator.getService(CySwingApplication.class);
 		this.resultPanel = new RepoResultPanel (this);
 
@@ -132,6 +139,14 @@ public class RepoApplication {
 		
 		this.application.addAction(new LicenseAction(this, licensePanel));
 
+	}
+
+	public NeDRexService getNedrexService() {
+		return nedrexService;
+	}
+
+	public ApiRoutesUtil getApiRoutesUtil() {
+		return apiRoutesUtil;
 	}
 
 	public JDialog getQuickSelectDialog2(){

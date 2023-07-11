@@ -2,10 +2,8 @@ package org.cytoscape.nedrex.internal.tasks;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.cytoscape.model.*;
 import org.cytoscape.nedrex.internal.*;
 import org.cytoscape.nedrex.internal.algorithms.ClosenessAPI;
@@ -30,7 +28,7 @@ import java.util.*;
 /**
  * NeDRex App
  * @author Sepideh Sadegh
- * @modified by: Andreas Maier
+ * @author Andreas Maier
  */
 public class MuSTapiCreateNetTask extends AbstractTask{
 	
@@ -48,6 +46,7 @@ public class MuSTapiCreateNetTask extends AbstractTask{
 	public MuSTapiCreateNetTask(RepoApplication app, Boolean quick, Set<String> mustNodes, Set<List<String>> edges, Map<String, Integer> nodeParticipationMap,
 			Map<List<String>, Integer> edgeParticipationMap, Set<String> seeds_in_network, Boolean ggType, String newNetName) {
 		this.app = app;
+		this.setNedrexService(app.getNedrexService());
 		this.quick = quick;
 		this.mustNodes = mustNodes;
 		this.edges = edges;
@@ -121,18 +120,17 @@ public class MuSTapiCreateNetTask extends AbstractTask{
 		if (ggType) {
 			url = String.format(this.nedrexService.API_LINK + "%s/attributes/json", geneEntity);
 		}
-		else if (!ggType) {
+		else{
 			url = String.format(this.nedrexService.API_LINK + "%s/attributes/json", proteinEntity);
 		}
 
-		HttpClient httpClient = new DefaultHttpClient();
 		HttpGetWithEntity e = new HttpGetWithEntity();
 		e = new HttpGetWithEntity();
 		e.setURI(new URI(url));
 		e.setEntity(new StringEntity(payload.toString(), ContentType.APPLICATION_JSON));
 		
 		try {
-			HttpResponse response = httpClient.execute(e);
+			HttpResponse response = nedrexService.send(e);
 			BufferedReader rd = new BufferedReader (new InputStreamReader(response.getEntity().getContent()));
 			String line = "";
 			String  responseText = "";
@@ -167,7 +165,7 @@ public class MuSTapiCreateNetTask extends AbstractTask{
 				mustNet.getDefaultNodeTable().getRow(cynode.getSUID()).set(nodeTypeCol, NodeType.Gene.toString());
 				mustNet.getDefaultNodeTable().getRow(cynode.getSUID()).set(nodeDisplayNameCol, geneDispNameMap.getOrDefault("entrez."+node, ""));
 			}
-			else if (!ggType) {
+			else {
 				mustNet.getDefaultNodeTable().getRow(cynode.getSUID()).set("name", "uniprot."+node);
 				mustNet.getDefaultNodeTable().getRow(cynode.getSUID()).set(nodeTypeCol, NodeType.Protein.toString());	
 				mustNet.getDefaultNodeTable().getRow(cynode.getSUID()).set(nodeDisplayNameCol, geneDispNameMap.getOrDefault("uniprot."+node, ""));
@@ -189,7 +187,7 @@ public class MuSTapiCreateNetTask extends AbstractTask{
 				mustNet.getDefaultEdgeTable().getRow(cyedge.getSUID()).set("name", "entrez."+edge.get(0) + " (-) " + "entrez."+edge.get(1));				
 				mustNet.getDefaultEdgeTable().getRow(cyedge.getSUID()).set(edgeTypeCol, InteractionType.gene_gene.toString());
 			}
-			else if (!ggType) {
+			else {
 				mustNet.getDefaultEdgeTable().getRow(cyedge.getSUID()).set("name", "uniprot."+edge.get(0) + " (-) " + "uniprot."+edge.get(1));				
 				mustNet.getDefaultEdgeTable().getRow(cyedge.getSUID()).set(edgeTypeCol, InteractionType.protein_protein.toString());
 			}
@@ -217,7 +215,7 @@ public class MuSTapiCreateNetTask extends AbstractTask{
 		}
 		
 		if(quick) {
-			ClosenessAPI closeness = new ClosenessAPI(mustNet, 100);
+			ClosenessAPI closeness = new ClosenessAPI(app.getNedrexService(), app.getApiRoutesUtil(),mustNet, 100);
 			Set<String> genes_must = closeness.getGenes();
 			List<List<String>> edgesGG = closeness.getGGEdges();
 			List<List<String>> edgesDrP = closeness.getDrPEdges();

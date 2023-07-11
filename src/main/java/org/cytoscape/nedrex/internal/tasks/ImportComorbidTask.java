@@ -3,19 +3,18 @@ package org.cytoscape.nedrex.internal.tasks;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyTableUtil;
-import org.cytoscape.nedrex.internal.LoadNetworkTask;
+import org.cytoscape.nedrex.internal.DownloadNetworkTask;
+import org.cytoscape.nedrex.internal.ImportNetworkTask;
 import org.cytoscape.nedrex.internal.NeDRexService;
 import org.cytoscape.nedrex.internal.RepoApplication;
 import org.cytoscape.nedrex.internal.ui.ComorbOptionPanel;
@@ -31,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
@@ -42,7 +42,7 @@ import java.util.Set;
 /**
  * NeDRex App
  * @author Sepideh Sadegh
- * @modified by: Andreas Maier
+ * @author Andreas Maier
  */
 public class ImportComorbidTask extends AbstractTask{
 	private Logger logger = LoggerFactory.getLogger(getClass());
@@ -51,6 +51,7 @@ public class ImportComorbidTask extends AbstractTask{
 
     public ImportComorbidTask(RepoApplication app, ComorbOptionPanel optionsPanel){
         this.app = app;
+        this.setNedrexService(app.getNedrexService());
         this.optionsPanel = optionsPanel;
     }
     
@@ -115,7 +116,6 @@ public class ImportComorbidTask extends AbstractTask{
         app.deselectCurrentNetwork();
 
         HttpPost post = new HttpPost(this.nedrexService.API_LINK+ "comorbiditome/submit_comorbiditome_build");
-        HttpClient client = new DefaultHttpClient();
 
         post.setEntity(new StringEntity(payload.toString(), ContentType.APPLICATION_JSON));
         String uidd = new String();
@@ -125,7 +125,7 @@ public class ImportComorbidTask extends AbstractTask{
 
         try {
 
-            HttpResponse response = client.execute(post);
+            HttpResponse response = nedrexService.send(post);
             HttpEntity entity = response.getEntity();
             BufferedReader rd = new BufferedReader(new InputStreamReader(entity.getContent()));
             String line = "";
@@ -146,10 +146,8 @@ public class ImportComorbidTask extends AbstractTask{
 
         //// now GET
         String uid = uidd.replace("\"", "");
-//        HttpGet request = new HttpGet(Constant.Dev_API_LINK+"comorbiditome/comorbiditome_build_status"+uid); // uid is the query parameter here (different than graph build. Modify this line  
-        
+
         HttpGet request = new HttpGet(this.nedrexService.API_LINK+"comorbiditome/comorbiditome_build_status");
-//		HttpClient client2 = new DefaultHttpClient();
 		URI uri = new URIBuilder(request.getURI()).addParameter("uid", uid).build();
 		((HttpRequestBase) request).setURI(uri);
 		
@@ -159,7 +157,7 @@ public class ImportComorbidTask extends AbstractTask{
         taskMonitor.setStatusMessage("Your network is being built...");
         double progress = 0.3;
         try {
-            HttpResponse response = client.execute(request);
+            HttpResponse response = nedrexService.send(request);
             boolean Success = false;
             boolean Failed = false;
 
@@ -191,14 +189,16 @@ public class ImportComorbidTask extends AbstractTask{
                     }
 
                     DialogTaskManager taskmanager = app.getActivator().getService(DialogTaskManager.class);
-                    taskmanager.execute(new TaskIterator(new LoadNetworkTask(app,urlp)));
+                    File file = File.createTempFile("comorbiditome", ".graphml");
+                    taskmanager.execute(new TaskIterator(new DownloadNetworkTask(app,urlp, file, nedrexService)));
+                    taskmanager.execute(new TaskIterator(new ImportNetworkTask(app,file)));
                     break;
                 }
                 if (Failed) {
                     logger.info("The build has failed!");
                     break;
                 }
-                response = client.execute(request);
+                response = nedrexService.send(request);
                 try {
                     if(progress < 0.9) {
                         progress += 0.1;

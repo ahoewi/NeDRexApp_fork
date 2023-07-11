@@ -20,7 +20,7 @@ import org.cytoscape.work.util.ListSingleSelection;
 /**
  * NeDRex App
  * @author Sepideh Sadegh
- * @modified by: Andreas Maier
+ * @author Andreas Maier
  */
 public class ModelUtil {
 	

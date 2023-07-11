@@ -3,12 +3,10 @@ package org.cytoscape.nedrex.internal.ui;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.cytoscape.nedrex.internal.*;
 import org.cytoscape.nedrex.internal.menuactions.AboutAction;
@@ -31,7 +29,7 @@ import java.util.List;
 /**
  * NeDRex App
  * @author Sepideh Sadegh
- * @modified by: Andreas Maier
+ * @author Andreas Maier
  */
 public class GetNetworkPanel extends JPanel{
 	private RepoApplication app;
@@ -42,6 +40,7 @@ public class GetNetworkPanel extends JPanel{
 	JButton importButton;
 	AboutPanel aboutPanel;
 	LicensePanel licensePanel;
+
 	
 	public GetNetworkPanel(RepoApplication app) {
 		super(new GridBagLayout());
@@ -110,170 +109,160 @@ public class GetNetworkPanel extends JPanel{
 
 
 
-	// this function is not used now >> see ImportAction in line 111
-	class InitialAction extends AbstractAction {
-		public InitialAction() {
-			super("Import");
-		}
-
-		private NeDRexService nedrexService;
-		@Reference
-		public void setNedrexService(NeDRexService nedrexService) {
-			this.nedrexService = nedrexService;
-		}
-
-		public void unsetNedrexService(NeDRexService nedrexService) {
-			if (this.nedrexService == nedrexService)
-				this.nedrexService = null;
-		}
-
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			
-			JSONObject payload = new JSONObject();
-			// empty nodes overwrite the default node selection of : gene, protein, disorder, drug 
-			// >> if single nodes without any edges are not desired in the network, empty node list should be used to overwrite the default
-			List<String> nodes = new ArrayList<String>();
-			List<String> edges = new ArrayList<String>();
-			edges = optionsPanel.getSelectedEdgeTypes();;
-			List<String> iidEvids = optionsPanel.getIIDevidence();
-			List<String> drugGroups = optionsPanel.getSelectedDrugGroups();
-			Boolean ppiSL = optionsPanel.getSelfLoop();
-			List<Integer> taxIDs = new ArrayList<Integer>();
-			taxIDs.add(9606);
-			if (optionsPanel.allTaxIDSelected()) {
-				taxIDs.add(-1);
-			}
-			System.out.println("This is the selected threshold: " + optionsPanel.getThreshold());
-			String networkName = optionsPanel.getNetworkName();
-			logger.info("The entered name of the new network by user: " + networkName);
-			//System.out.println("The entered name of the new network by user: " + networkName);
-			
-			
-			Boolean concise = false;
-			payload.put("nodes", nodes);
-			payload.put("edges", edges);
-			payload.put("ppi_evidence", iidEvids);
-			payload.put("ppi_self_loops", ppiSL);
-			payload.put("taxid", taxIDs);
-			payload.put("concise", concise);
-			payload.put("disgenet_threshold", optionsPanel.getThreshold());
-			payload.put("include_omim", optionsPanel.includeOMIM());
-			payload.put("drug_groups", drugGroups);
-			
-			logger.info("The post JSON converted to string: " + payload.toString());
-
-
-			/*CloseableHttpClient client = HttpClients.createDefault();			
-			CloseableHttpResponse response = null;*/
-			HttpPost post = new HttpPost(this.nedrexService.API_LINK+"graph/builder");
-			
-			//HttpClient client = HttpClientBuilder.create().build();
-			HttpClient client = new DefaultHttpClient();
-			
-			//post.setEntity(new StringEntity(strEntity, ContentType.APPLICATION_FORM_URLENCODED));
-			post.setEntity(new StringEntity(payload.toString(), ContentType.APPLICATION_JSON));
-			String uidd = new String();
-			logger.info("The post: "+ post.toString());
-			
-			try {
-				HttpResponse response = client.execute(post);
-				HttpEntity entity = response.getEntity();
-				logger.info("The response entity is: " + entity);
-				BufferedReader rd = new BufferedReader(new InputStreamReader(entity.getContent()));
-				String line = "";
-				logger.info("Response entity: ");
-				while ((line = rd.readLine()) != null) {
-					System.out.println(line);
-					logger.info("The uri of the response to the post: "+line + "\n");
-					uidd = line;
-				  }
-				EntityUtils.consume(entity);
-			} catch (ClientProtocolException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (IOException e2) {
-				// TODO Auto-generated catch block
-				e2.printStackTrace();
-			} /*finally {
-				try {
-					response.close();
-				} catch (Exception e3) {
-					e3.printStackTrace();
-				}
-			}*/
-			
-			//InputStream entityStream = entity1.getContent();
-			
-			//BufferedReader reader = new BufferedReader(new InputStreamReader(entityStream));
-			//HttpResponse response = client.execute(post);
-			
-			//// now GET
-			String uid = uidd.replace("\"", "");
-			HttpGet request = new HttpGet(this.nedrexService.API_LINK+"graph/details/"+uid);
-			try {
-				HttpResponse response = client.execute(request);
-				boolean Success = false;
-				boolean Failed = false;
-				  
-				  // we're letting it build for t*10 seconds
-				for (int t=0; t<60; t++) {
-					BufferedReader rd = new BufferedReader (new InputStreamReader(response.getEntity().getContent()));
-					String line = "";
-					while ((line = rd.readLine()) != null) {
-						System.out.println(line);
-						logger.info(line);
-						if (line.contains("completed"))
-							Success=true;
-						if (line.contains("failed")) {
-							Failed=true;
-						}
-					}
-					if(Success) {
-						System.out.println("Built was success!!!");
-						logger.info("Built was successful!");
-						//String urlp = "http://repotrial.bioswarm.net:29492/v2/graph_download/"+uid+".graphml";
-						//String urlp = "http://repotrial.bioswarm.net:29492/v2/graph_download_v2/"+uid+"/"+networkName+".graphml";
-						String urlp = "";
-						if (!networkName.equals("")) {
-//							urlp = "https://api.repotrial.net/graph_download_v2/"+uid+"/"+networkName+".graphml";
-							urlp = this.nedrexService.API_LINK+"graph/download/"+uid+"/"+networkName+".graphml";
-						}
-						else {
-//							urlp = "https://api.repotrial.net/graph_download/"+uid+".graphml";
-							urlp = this.nedrexService.API_LINK+"graph/download/"+uid+".graphml";
-						}
-						//String urlp = "https://api.repotrial.net/graph_download_v2/"+uid+"/"+networkName+".graphml";
-						DialogTaskManager taskmanager = app.getActivator().getService(DialogTaskManager.class);
-						taskmanager.execute(new TaskIterator(new LoadNetworkTask(app,urlp)));
-						break;
-					}
-					if (Failed) {
-						logger.info("The build has failed!");
-						break;
-					}
-					response = client.execute(request);
-					try {
-						logger.info("Waiting for build to complete, sleeping for 10 seconds...");
-						Thread.sleep(10000);
-					} catch (InterruptedException e0) {
-						// TODO Auto-generated catch block
-						e0.printStackTrace();
-					}
-
-				} 
-				  
-			} catch (ClientProtocolException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (IOException e2) {
-				// TODO Auto-generated catch block
-				e2.printStackTrace();
-			}
-			
-		}
-
-	}
+//	// this function is not used now >> see ImportAction in line 111
+//	class InitialAction extends AbstractAction {
+//		public InitialAction() {
+//			super("Import");
+//		}
+//
+//		private NeDRexService nedrexService;
+//		@Reference
+//		public void setNedrexService(NeDRexService nedrexService) {
+//			this.nedrexService = nedrexService;
+//		}
+//
+//		public void unsetNedrexService(NeDRexService nedrexService) {
+//			if (this.nedrexService == nedrexService)
+//				this.nedrexService = null;
+//		}
+//
+//
+//		@Override
+//		public void actionPerformed(ActionEvent e) {
+//
+//			JSONObject payload = new JSONObject();
+//			// empty nodes overwrite the default node selection of : gene, protein, disorder, drug
+//			// >> if single nodes without any edges are not desired in the network, empty node list should be used to overwrite the default
+//			List<String> nodes = new ArrayList<String>();
+//			List<String> edges = new ArrayList<String>();
+//			edges = optionsPanel.getSelectedEdgeTypes();;
+//			List<String> iidEvids = optionsPanel.getIIDevidence();
+//			List<String> drugGroups = optionsPanel.getSelectedDrugGroups();
+//			Boolean ppiSL = optionsPanel.getSelfLoop();
+//			List<Integer> taxIDs = new ArrayList<Integer>();
+//			taxIDs.add(9606);
+//			if (optionsPanel.allTaxIDSelected()) {
+//				taxIDs.add(-1);
+//			}
+//			System.out.println("This is the selected threshold: " + optionsPanel.getThreshold());
+//			String networkName = optionsPanel.getNetworkName();
+//			logger.info("The entered name of the new network by user: " + networkName);
+//			//System.out.println("The entered name of the new network by user: " + networkName);
+//
+//
+//			Boolean concise = false;
+//			payload.put("nodes", nodes);
+//			payload.put("edges", edges);
+//			payload.put("ppi_evidence", iidEvids);
+//			payload.put("ppi_self_loops", ppiSL);
+//			payload.put("taxid", taxIDs);
+//			payload.put("concise", concise);
+//			payload.put("disgenet_threshold", optionsPanel.getThreshold());
+//			payload.put("include_omim", optionsPanel.includeOMIM());
+//			payload.put("drug_groups", drugGroups);
+//
+//			logger.info("The post JSON converted to string: " + payload.toString());
+//
+//
+//			HttpPost post = new HttpPost(this.nedrexService.API_LINK+"graph/builder");
+//
+//
+//			post.setEntity(new StringEntity(payload.toString(), ContentType.APPLICATION_JSON));
+//			String uidd = new String();
+//			logger.info("The post: "+ post.toString());
+//
+//			try {
+//				HttpResponse response = nedrexService.send(post);
+//				HttpEntity entity = response.getEntity();
+//				logger.info("The response entity is: " + entity);
+//				BufferedReader rd = new BufferedReader(new InputStreamReader(entity.getContent()));
+//				String line = "";
+//				logger.info("Response entity: ");
+//				while ((line = rd.readLine()) != null) {
+//					System.out.println(line);
+//					logger.info("The uri of the response to the post: "+line + "\n");
+//					uidd = line;
+//				  }
+//				EntityUtils.consume(entity);
+//			} catch (ClientProtocolException e1) {
+//				// TODO Auto-generated catch block
+//				e1.printStackTrace();
+//			} catch (IOException e2) {
+//				// TODO Auto-generated catch block
+//				e2.printStackTrace();
+//			} /*finally {
+//				try {
+//					response.close();
+//				} catch (Exception e3) {
+//					e3.printStackTrace();
+//				}
+//			}*/
+//
+//			//InputStream entityStream = entity1.getContent();
+//
+//			//BufferedReader reader = new BufferedReader(new InputStreamReader(entityStream));
+//			//HttpResponse response = client.execute(post);
+//
+//			//// now GET
+//			String uid = uidd.replace("\"", "");
+//			HttpGet request = new HttpGet(this.nedrexService.API_LINK+"graph/details/"+uid);
+//			try {
+//				HttpResponse response = nedrexService.send(request);
+//				boolean Success = false;
+//				boolean Failed = false;
+//
+//				  // we're letting it build for t*10 seconds
+//				for (int t=0; t<60; t++) {
+//					BufferedReader rd = new BufferedReader (new InputStreamReader(response.getEntity().getContent()));
+//					String line = "";
+//					while ((line = rd.readLine()) != null) {
+//						System.out.println(line);
+//						logger.info(line);
+//						if (line.contains("completed"))
+//							Success=true;
+//						if (line.contains("failed")) {
+//							Failed=true;
+//						}
+//					}
+//					if(Success) {
+//						System.out.println("Built was success!!!");
+//						logger.info("Built was successful!");
+//						String urlp = "";
+//						if (!networkName.equals("")) {
+//							urlp = this.nedrexService.API_LINK+"graph/download/"+uid+"/"+networkName+".graphml";
+//						}
+//						else {
+//							urlp = this.nedrexService.API_LINK+"graph/download/"+uid+".graphml";
+//						}
+//						DialogTaskManager taskmanager = app.getActivator().getService(DialogTaskManager.class);
+//						taskmanager.execute(new TaskIterator(new LoadNetworkTask(app,urlp)));
+//						break;
+//					}
+//					if (Failed) {
+//						logger.info("The build has failed!");
+//						break;
+//					}
+//					response = nedrexService.send(request);
+//					try {
+//						logger.info("Waiting for build to complete, sleeping for 10 seconds...");
+//						Thread.sleep(10000);
+//					} catch (InterruptedException e0) {
+//						// TODO Auto-generated catch block
+//						e0.printStackTrace();
+//					}
+//
+//				}
+//
+//			} catch (ClientProtocolException e1) {
+//				// TODO Auto-generated catch block
+//				e1.printStackTrace();
+//			} catch (IOException e2) {
+//				// TODO Auto-generated catch block
+//				e2.printStackTrace();
+//			}
+//
+//		}
+//
+//	}
 
 }

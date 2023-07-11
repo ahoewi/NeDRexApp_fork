@@ -14,7 +14,7 @@ import java.net.URISyntaxException;
 /**
  * NeDRex App
  * @author Judith Bernett
- * @modified by: Andreas Maier
+ * @author Andreas Maier
  */
 public class InfoBox {
 

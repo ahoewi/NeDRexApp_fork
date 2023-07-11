@@ -9,7 +9,7 @@ import org.cytoscape.work.TaskIterator;
 /**
  * NeDRex App
  * @author Sepideh Sadegh
- * @modified by: Andreas Maier
+ * @author Andreas Maier
  */
 public class RepoTrialDBWebServiceClient extends AbstractWebServiceGUIClient implements NetworkImportWebServiceClient{
 	

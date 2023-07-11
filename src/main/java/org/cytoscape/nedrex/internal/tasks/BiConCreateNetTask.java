@@ -2,10 +2,8 @@ package org.cytoscape.nedrex.internal.tasks;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.cytoscape.model.*;
 import org.cytoscape.nedrex.internal.io.HttpGetWithEntity;
 import org.cytoscape.nedrex.internal.utils.ViewUtils;
@@ -29,7 +27,7 @@ import java.util.*;
 /**
  * NeDRex App
  * @author Sepideh Sadegh
- * @modified by: Andreas Maier
+ * @author Andreas Maier
  */
 public class BiConCreateNetTask extends AbstractTask{
 	
@@ -43,6 +41,7 @@ public class BiConCreateNetTask extends AbstractTask{
 	
 	public BiConCreateNetTask (RepoApplication app, Set<String> nodes, List<List<String>> edges, Map<String, Double> genesMap1, Map<String, Double> genesMap2, String newNetName) {
 		this.app = app;
+		this.setNedrexService(app.getNedrexService());
 		this.nodes = nodes;
 		this.edges = edges;
 		this.genesMap1 = genesMap1;
@@ -104,14 +103,13 @@ public class BiConCreateNetTask extends AbstractTask{
 		
 //		String url = String.format("https://api.repotrial.net/%s/attributes_v2/json", "gene");
 		String url = String.format(this.nedrexService.API_LINK + "%s/attributes/json", "gene");
-		HttpClient httpClient = new DefaultHttpClient();
 		HttpGetWithEntity e = new HttpGetWithEntity();
 		e = new HttpGetWithEntity();
 		e.setURI(new URI(url));
 		e.setEntity(new StringEntity(payload.toString(), ContentType.APPLICATION_JSON));
 		
 		try {
-			HttpResponse response = httpClient.execute(e);
+			HttpResponse response = nedrexService.send(e);
 			BufferedReader rd = new BufferedReader (new InputStreamReader(response.getEntity().getContent()));
 			String line = "";
 			String  responseText = "";

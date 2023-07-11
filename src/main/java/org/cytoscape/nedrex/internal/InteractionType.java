@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 public enum InteractionType {
 
 	gene_disease(NodeType.Gene, NodeType.Disease, "GeneAssociatedWithDisorder", "gene_associated_with_disorder"),
-	gene_protein(NodeType.Protein, NodeType.Gene, "ProteinEncodedBy", "protein_encoded_by"),
+	gene_protein(NodeType.Protein, NodeType.Gene, "ProteinEncodedBy", "protein_encoded_by_gene"),
 	protein_protein(NodeType.Protein, NodeType.Protein, "ProteinInteractsWithProtein", "protein_interacts_with_protein"),
 	// added the following types for new Diseasome based on shared Gene
 	disease_disease(NodeType.Disease, NodeType.Disease, "DiseaseSharedGeneDisease", "disease-sharedGene-disease"),

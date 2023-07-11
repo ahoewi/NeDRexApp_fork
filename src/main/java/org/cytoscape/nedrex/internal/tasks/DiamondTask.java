@@ -3,14 +3,12 @@ package org.cytoscape.nedrex.internal.tasks;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
@@ -37,7 +35,7 @@ import java.util.*;
 /**
  * NeDRex App
  * @author Sepideh Sadegh
- * @modified by: Andreas Maier
+ * @author Andreas Maier
  */
 public class DiamondTask extends AbstractTask{
 	
@@ -94,6 +92,7 @@ public class DiamondTask extends AbstractTask{
 	
 	public DiamondTask (RepoApplication app) {
 		this.app = app;
+		this.setNedrexService(app.getNedrexService());
 	}
 	
 	protected void showWarningTime() {
@@ -143,16 +142,14 @@ public class DiamondTask extends AbstractTask{
 			newNetName = namingUtil.getSuggestedNetworkTitle(new_net_name);
 		}
 		
-//		String submit_url = "https://api.repotrial.net/diamond/submit";
-//		String status_url = "https://api.repotrial.net/diamond/status";
 		String submit_url = this.nedrexService.API_LINK + "diamond/submit";
 		String status_url = this.nedrexService.API_LINK + "diamond/status";
 		
 		JSONObject payload = new JSONObject();
-		List<String> seeds = new ArrayList<String>();		
-		List<String> selectedNodeNames = new ArrayList<String>();
+		List<String> seeds = new ArrayList<>();
+		List<String> selectedNodeNames = new ArrayList<>();
 		Boolean ggType = false;		
-		Set<String> seeds_in_network = new HashSet<String>();
+		Set<String> seeds_in_network = new HashSet<>();
 		int sleep_time = 3; //in seconds
 		
 		if (!seedFile) {
@@ -202,12 +199,11 @@ public class DiamondTask extends AbstractTask{
 		logger.info("The post JSON converted to string: " + payload.toString());
 		
 		HttpPost post = new HttpPost(submit_url);
-		HttpClient client = new DefaultHttpClient();
 		post.setEntity(new StringEntity(payload.toString(), ContentType.APPLICATION_JSON));
 		String uidd = new String();
 		Boolean failedSubmit = false;
 		try {
-			HttpResponse response = client.execute(post);
+			HttpResponse response = nedrexService.send(post);
 			HttpEntity entity = response.getEntity();
 			BufferedReader rd = new BufferedReader(new InputStreamReader(entity.getContent()));
 			String line = "";
@@ -258,7 +254,7 @@ public class DiamondTask extends AbstractTask{
 			
 			boolean Success = false;
 			try {
-				HttpResponse response = client.execute(request);
+				HttpResponse response = nedrexService.send(request);
 //				boolean Success = false;
 				boolean Failed = false;
 				  
@@ -333,7 +329,7 @@ public class DiamondTask extends AbstractTask{
 						showFailed();
 						break;
 					}
-					response = client.execute(request);
+					response = nedrexService.send(request);
 					try {
 						logger.info(String.format("Waiting for run to complete, sleeping for %d seconds...", sleep_time));
 						Thread.sleep(sleep_time*1000);

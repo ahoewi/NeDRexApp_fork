@@ -3,14 +3,12 @@ package org.cytoscape.nedrex.internal.tasks;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
@@ -42,7 +40,7 @@ import java.util.Set;
 /**
  * NeDRex App
  * @author Sepideh Sadegh
- * @modified by: Andreas Maier
+ * @author Andreas Maier
  */
 public class DrugBasedValidTask extends AbstractTask{
 	private RepoApplication app;
@@ -95,6 +93,7 @@ public class DrugBasedValidTask extends AbstractTask{
 	
 	public DrugBasedValidTask(RepoApplication app, RepoResultPanel resultPanel) {
 		this.app = app;
+		this.setNedrexService(app.getNedrexService());
 		this.resultPanel = resultPanel;
 	}
 	
@@ -206,12 +205,11 @@ public class DrugBasedValidTask extends AbstractTask{
 		logger.info("The post JSON converted to string: " + payload.toString());
 		
 		HttpPost post = new HttpPost(submit_url);
-		HttpClient client = new DefaultHttpClient();
 		post.setEntity(new StringEntity(payload.toString(), ContentType.APPLICATION_JSON));
 		String uidd = new String();
 		Boolean failedSubmit = false;
 		try {
-			HttpResponse response = client.execute(post);
+			HttpResponse response = nedrexService.send(post);
 			HttpEntity entity = response.getEntity();
 			BufferedReader rd = new BufferedReader(new InputStreamReader(entity.getContent()));
 			String line = "";
@@ -257,7 +255,7 @@ public class DrugBasedValidTask extends AbstractTask{
 			
 			boolean Success = false;
 			try {
-				HttpResponse response = client.execute(request);
+				HttpResponse response = nedrexService.send(request);
 //				boolean Success = false;
 				boolean Failed = false;
 				  
@@ -280,9 +278,7 @@ public class DrugBasedValidTask extends AbstractTask{
 					}
 					if(Success) {
 						logger.info("The run is successfully completed! This is the response: " + response.getParams());
-//						logger.info("The status line of the response:" + response.getStatusLine());
-//						logger.info("This is the response text of the successful: " + responseText);
-						
+
 						JSONParser parser = new JSONParser();
 						JSONObject json = (JSONObject) parser.parse(responseText);
 						logger.info("The result values of the response json onbject for empirical DCG-based p-value: " + json.get("empirical DCG-based p-value"));
@@ -290,46 +286,6 @@ public class DrugBasedValidTask extends AbstractTask{
 						pvalue_DCG = String.valueOf(json.get("empirical DCG-based p-value"));
 						pvalue = String.valueOf(json.get("empirical p-value without considering ranks"));
 						
-						
-						/*JSONArray jarrEdges = (JSONArray) json2.get("edges");
-						JSONArray jarrDiamondNodes = (JSONArray) json2.get("diamond_nodes");
-						JSONArray jarrSeeds = (JSONArray) json2.get("seeds_in_network");
-						
-						Set<List<String>> edges = new HashSet<List<String>> ();
-						Set<String> diamondNodes = new HashSet<String> ();
-						Map<String, Integer> scoreMap = new HashMap <String, Integer>();
-						Map<String, Double> pHyperMap = new HashMap <String, Double>();
-						
-						for (Object e: jarrEdges) {
-							List<String> nn = (ArrayList<String>)e;						
-							edges.add(nn);
-							diamondNodes.add(nn.get(0));
-							diamondNodes.add(nn.get(1));					
-//							logger.info(e.toString() + " - and the ndoes: " + nn.get(0) + " and " + nn.get(1) );
-						}
-						
-						for (Object diamondNode: jarrDiamondNodes) {
-							 JSONObject dnobj = (JSONObject) diamondNode;
-							 String dnName = (String) dnobj.get("DIAMOnD_node");
-							 String rk = (String) dnobj.get("rank");
-							 Integer rank = Integer.parseInt(rk);
-							 String ph = (String) dnobj.get("p_hyper");
-							 Double phyp = Double.parseDouble(ph);
-							 diamondNodes.add(dnName);
-							 scoreMap.put(dnName, rank);
-							 pHyperMap.put(dnName, phyp);
-						}
-						
-						for (Object seedObj: jarrSeeds) {
-							 String seed = (String) seedObj;
-							 diamondNodes.add(seed);
-							 seeds_in_network.add(seed);
-						}*/
-						
-//						DialogTaskManager taskmanager = app.getActivator().getService(DialogTaskManager.class);
-//						taskmanager.execute(new TaskIterator(new DiamondCreateNetTask(app, false, diamondNodes, edges, scoreMap, pHyperMap, seeds_in_network, ggType, newNetName)));
-
-//						resultPanel.activateFromDrugValidation(this);
 						break;
 					}
 					if (Failed) {
@@ -337,7 +293,7 @@ public class DrugBasedValidTask extends AbstractTask{
 						showFailed();
 						break;
 					}
-					response = client.execute(request);
+					response = nedrexService.send(request);
 					try {
 						logger.info(String.format("Waiting for run to complete, sleeping for %d seconds...", sleep_time));
 						Thread.sleep(sleep_time*1000);

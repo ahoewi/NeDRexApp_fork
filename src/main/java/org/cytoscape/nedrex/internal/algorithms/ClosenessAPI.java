@@ -3,14 +3,12 @@ package org.cytoscape.nedrex.internal.algorithms;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
@@ -34,7 +32,7 @@ import java.util.Map.Entry;
 /**
  * NeDRex App
  * @author Sepideh Sadegh
- * @modified by: Andreas Maier
+ * @author Andreas Maier
  */
 public class ClosenessAPI {
 	CyNetwork network;
@@ -50,10 +48,11 @@ public class ClosenessAPI {
 	Set<String> primary_seeds = new HashSet<String>();
 	Boolean Success;
 	
-	public ClosenessAPI(CyNetwork network, Integer result_size) throws URISyntaxException, ParseException {
+	public ClosenessAPI(NeDRexService nedrexService, ApiRoutesUtil apiRoutesUtil, CyNetwork network, Integer result_size) throws URISyntaxException, ParseException {
 		this.network = network;
 		this.result_size = result_size;
-		
+		this.nedrexService = nedrexService;
+		this.apiUtils = apiRoutesUtil;
 		runAlgorithm();
 	}
 
@@ -69,16 +68,7 @@ public class ClosenessAPI {
 	}
 
 	private ApiRoutesUtil apiUtils;
-	@Reference
-	public void setAPIUtils(ApiRoutesUtil apiUtils) {
-		this.apiUtils = apiUtils;
-	}
 
-	public void unsetAPIUtils(ApiRoutesUtil apiUtils) {
-		if (this.apiUtils == apiUtils)
-			this.apiUtils = null;
-	}
-	
 	public void runAlgorithm() throws URISyntaxException, ParseException {	
 		String submit_url = this.nedrexService.API_LINK + "closeness/submit";
 		String status_url = this.nedrexService.API_LINK + "closeness/status";
@@ -120,13 +110,12 @@ public class ClosenessAPI {
 		payload.put("N", result_size);
 		
 		HttpPost post = new HttpPost(submit_url);
-		HttpClient client = new DefaultHttpClient();
 		post.setEntity(new StringEntity(payload.toString(), ContentType.APPLICATION_JSON));
 		String uidd = new String();
 		Boolean failedSubmit = false;
 		
 		try {
-			HttpResponse response = client.execute(post);
+			HttpResponse response = nedrexService.send(post);
 			HttpEntity entity = response.getEntity();
 			BufferedReader rd = new BufferedReader(new InputStreamReader(entity.getContent()));
 			String line = "";
@@ -159,7 +148,7 @@ public class ClosenessAPI {
 			logger.info("The uid: " + uid);					
 			Success = false;
 			try {
-				HttpResponse response = client.execute(request);
+				HttpResponse response = nedrexService.send(request);
 				boolean Failed = false;			  
 				  // we're letting it build for t*3 seconds
 				for (int t=0; t<200; t++) {
@@ -218,7 +207,7 @@ public class ClosenessAPI {
 						logger.info("The run is failed!");
 						break;
 					}
-					response = client.execute(request);
+					response = nedrexService.send(request);
 					try {
 						logger.info(String.format("Waiting for run to complete, sleeping for %d seconds...", sleep_time));
 						Thread.sleep(sleep_time*1000);

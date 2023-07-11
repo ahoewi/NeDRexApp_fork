@@ -13,7 +13,7 @@ import java.awt.*;
 /**
  * NeDRex App
  * @author Sepideh Sadegh
- * @modified by: Andreas Maier
+ * @author Andreas Maier
  */
 public class GetComorbiditomePanel extends JPanel{
 	private RepoApplication app;

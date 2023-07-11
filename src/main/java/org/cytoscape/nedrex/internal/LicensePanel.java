@@ -2,9 +2,7 @@ package org.cytoscape.nedrex.internal;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +16,7 @@ import java.io.InputStreamReader;
 /**
  * NeDRex App
  * @author Sepideh Sadegh
- * @modified by: Andreas Maier
+ * @author Andreas Maier
  */
 public class LicensePanel extends JPanel{
 	private RepoApplication app;
@@ -32,6 +30,7 @@ public class LicensePanel extends JPanel{
 	public LicensePanel (RepoApplication app) {
 		super();
         this.app = app;
+        this.setNedrexService(app.getNedrexService());
         this.setBackground(Color.WHITE);
         infoPanel = new JPanel();
         infoPanel.setBackground(Color.WHITE);
@@ -56,11 +55,10 @@ public class LicensePanel extends JPanel{
         String licenceURL = this.nedrexService.API_LINK + "static/licence";
 
         HttpGet request = new HttpGet(licenceURL);
-        HttpClient client = new DefaultHttpClient();
-        
+
         String licenseText = "";
         try {
-			HttpResponse response = client.execute(request);
+			HttpResponse response = nedrexService.send(request);
 			String  responseText = "";
 			BufferedReader rd = new BufferedReader (new InputStreamReader(response.getEntity().getContent()));
 			String line = "";

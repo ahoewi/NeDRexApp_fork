@@ -9,7 +9,7 @@ import org.cytoscape.work.TaskIterator;
 /**
  * NeDRex App
  * @author Sepideh Sadegh
- * @modified by: Andreas Maier
+ * @author Andreas Maier
  */
 public class ComorbiditomeWebServiceClient extends AbstractWebServiceGUIClient implements NetworkImportWebServiceClient{
 	

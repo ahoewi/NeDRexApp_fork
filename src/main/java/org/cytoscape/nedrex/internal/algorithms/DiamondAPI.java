@@ -3,14 +3,12 @@ package org.cytoscape.nedrex.internal.algorithms;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
@@ -32,7 +30,7 @@ import java.util.*;
 /**
  * NeDRex App
  * @author Sepideh Sadegh
- * @modified by: Andreas Maier
+ * @author Andreas Maier
  */
 public class DiamondAPI {
 	CyNetwork network;
@@ -48,7 +46,8 @@ public class DiamondAPI {
 	Map<String, Double> pHyperMap = new HashMap <String, Double>();
 	Boolean Success;
 	
-	public DiamondAPI(CyNetwork network, Set<CyNode> seeds, Integer iter, Integer alpha) throws ParseException, URISyntaxException {
+	public DiamondAPI(NeDRexService nedrexService, CyNetwork network, Set<CyNode> seeds, Integer iter, Integer alpha) throws ParseException, URISyntaxException {
+		this.nedrexService = nedrexService;
 		this.network = network;
 		this.seeds = seeds;
 		this.iter = iter;
@@ -89,12 +88,11 @@ public class DiamondAPI {
 		logger.info("The post JSON converted to string: " + payload.toString());
 		
 		HttpPost post = new HttpPost(submit_url);
-		HttpClient client = new DefaultHttpClient();
 		post.setEntity(new StringEntity(payload.toString(), ContentType.APPLICATION_JSON));
 		String uidd = new String();
 		Boolean failedSubmit = false;
 		try {
-			HttpResponse response = client.execute(post);
+			HttpResponse response = nedrexService.send(post);
 			HttpEntity entity = response.getEntity();
 			BufferedReader rd = new BufferedReader(new InputStreamReader(entity.getContent()));
 			String line = "";
@@ -131,7 +129,7 @@ public class DiamondAPI {
 			
 			Success = false;
 			try {
-				HttpResponse response = client.execute(request);
+				HttpResponse response = nedrexService.send(request);
 //				boolean Success = false;
 				boolean Failed = false;
 				  
@@ -194,7 +192,7 @@ public class DiamondAPI {
 						logger.info("The run is failed!");
 						break;
 					}
-					response = client.execute(request);
+					response = nedrexService.send(request);
 					try {
 						logger.info(String.format("Waiting for run to complete, sleeping for %d seconds...", sleep_time));
 						Thread.sleep(sleep_time*1000);

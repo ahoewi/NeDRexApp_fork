@@ -17,7 +17,7 @@ import java.awt.event.ActionEvent;
 /**
  * NeDRex App
  * @author Sepideh Sadegh
- * @modified by: Andreas Maier
+ * @author Andreas Maier
  */
 // Not used in the current version
 public class MechanismBasedValidAction extends AbstractCyAction{

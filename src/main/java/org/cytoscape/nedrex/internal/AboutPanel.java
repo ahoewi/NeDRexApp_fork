@@ -1,9 +1,7 @@
 package org.cytoscape.nedrex.internal;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -29,7 +27,7 @@ import java.util.Properties;
  * NeDRex App
  *
  * @author Judith Bernett
- * @modified by: Andreas Maier
+ * @author Andreas Maier
  */
 @Component
 public class AboutPanel extends JPanel {
@@ -43,7 +41,7 @@ public class AboutPanel extends JPanel {
     JPanel leftPanel;
     JPanel centerPanel;
     JPanel rightPanel;
-    String reposcapeVersion;
+    String nedrexVersion;
     String repoTrialDBVersion;
     URI uniprotURI;
     URI uniprotLicense;
@@ -85,6 +83,7 @@ public class AboutPanel extends JPanel {
     public AboutPanel(RepoApplication app) {
         super();
         this.app = app;
+        this.setNedrexService(app.getNedrexService());
         this.setBackground(Color.WHITE);
         infoPanel = new JPanel();
         infoPanel.setBackground(Color.WHITE);
@@ -152,16 +151,14 @@ public class AboutPanel extends JPanel {
         welcomeLabel.setBorder(new EmptyBorder(10, 170, 10, 170));
         topPanel.add(welcomeLabel, BorderLayout.PAGE_START);
 
-//        String infoURL = "https://api.repotrial.net/static/metadata";
         String infoURL = NeDRexService.API_LINK + "static/metadata";
 
         JSONObject jsonInformation;
 
         HttpGet request = new HttpGet(infoURL);
-        HttpClient client = new DefaultHttpClient();
 
         try {
-            HttpResponse response = client.execute(request);
+            HttpResponse response = this.nedrexService.send(request);
             BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
             String responseText = rd.readLine();
 
@@ -172,7 +169,7 @@ public class AboutPanel extends JPanel {
 
             updateInfo(jsonInformation, source_databases);
 
-            JLabel repoScapeLabel = new JLabel("<html><b>NeDRexApp Version: </b>" + reposcapeVersion + "</html>");
+            JLabel repoScapeLabel = new JLabel("<html><b>NeDRexApp Version: </b>" + nedrexVersion + "</html>");
             repoScapeLabel.setBorder(new EmptyBorder(10, 10, 10, 10));
             repoScapeLabel.setFont(new Font("Helvetica", Font.PLAIN, 14));
             topPanel.add(repoScapeLabel);
@@ -283,8 +280,8 @@ public class AboutPanel extends JPanel {
         this.repoTrialDBVersion = (String) jsonInformation.get("version");
         Properties props = new Properties();
         try {
-            props.load(Objects.requireNonNull(AboutPanel.class.getClassLoader().getResourceAsStream("project.properties")));
-            this.reposcapeVersion = props.getProperty("version");
+            props.load(Objects.requireNonNull(AboutPanel.class.getClassLoader().getResourceAsStream("META-INF/maven/org.cytoscape.nedrex/NeDRex/pom.properties")));
+            this.nedrexVersion = props.getProperty("version");
         } catch (IOException io) {
             logger.info("IO Exception for pom file");
         }

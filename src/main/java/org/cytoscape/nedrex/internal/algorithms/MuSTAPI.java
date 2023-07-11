@@ -3,14 +3,12 @@ package org.cytoscape.nedrex.internal.algorithms;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
@@ -32,7 +30,7 @@ import java.util.*;
 /**
  * NeDRex App
  * @author Sepideh Sadegh
- * @modified by: Andreas Maier
+ * @author Andreas Maier
  */
 public class MuSTAPI {
 	CyNetwork network;
@@ -48,7 +46,7 @@ public class MuSTAPI {
 	Map<List<String>, Integer> edgeParticipationMap = new HashMap <List<String>, Integer>();
 	Boolean Success;
 	
-	public MuSTAPI(CyNetwork network, Set<CyNode> seeds, Integer treeNumber, Integer iterNumber) throws URISyntaxException, ParseException {
+	public MuSTAPI(NeDRexService nedrexService, CyNetwork network, Set<CyNode> seeds, Integer treeNumber, Integer iterNumber) throws URISyntaxException, ParseException {
 		this.network = network;
 		this.seeds = seeds;
 		this.treeNumber = treeNumber;
@@ -58,17 +56,7 @@ public class MuSTAPI {
 	}
 
 	private NeDRexService nedrexService;
-	@Reference
-	public void setNedrexService(NeDRexService nedrexService) {
-		this.nedrexService = nedrexService;
-	}
 
-	public void unsetNedrexService(NeDRexService nedrexService) {
-		if (this.nedrexService == nedrexService)
-			this.nedrexService = null;
-	}
-
-	
 	private void runAlgorithm() throws URISyntaxException, ParseException {
 				
 //		String submit_url = "https://api.repotrial.net/must/submit";
@@ -94,14 +82,13 @@ public class MuSTAPI {
 
 		
 		HttpPost post = new HttpPost(submit_url);
-		HttpClient client = new DefaultHttpClient();
 		post.setEntity(new StringEntity(payload.toString(), ContentType.APPLICATION_JSON));
 		System.out.println("The payload: " + payload.toString());
 		logger.info("The payload: " + payload.toString());
 		String uidd = new String();
 		Boolean failedSubmit = false;
 		try {
-			HttpResponse response = client.execute(post);
+			HttpResponse response = nedrexService.send(post);
 			HttpEntity entity = response.getEntity();
 			BufferedReader rd = new BufferedReader(new InputStreamReader(entity.getContent()));
 			String line = "";
@@ -140,7 +127,7 @@ public class MuSTAPI {
 //			boolean Success = false;
 			Success = false;
 			try {
-				HttpResponse response = client.execute(request);
+				HttpResponse response = nedrexService.send(request);
 				boolean Failed = false;				  
 				// we're letting it to run for t*3 seconds
 				for (int t=0; t<200; t++) {
@@ -216,7 +203,7 @@ public class MuSTAPI {
 						logger.info("The run is failed!");
 						break;
 					}
-					response = client.execute(request);
+					response = nedrexService.send(request);
 					try {
 						logger.info(String.format("Waiting for run to complete, sleeping for %d seconds...", sleep_time));
 						Thread.sleep(sleep_time*1000);

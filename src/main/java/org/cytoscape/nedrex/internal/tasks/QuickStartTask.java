@@ -1,11 +1,5 @@
 package org.cytoscape.nedrex.internal.tasks;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyTableUtil;
@@ -17,20 +11,17 @@ import org.cytoscape.nedrex.internal.algorithms.MuSTAPI;
 import org.cytoscape.nedrex.internal.utils.ApiRoutesUtil;
 import org.cytoscape.nedrex.internal.utils.FilterType;
 import org.cytoscape.session.CyNetworkNaming;
-import org.cytoscape.work.AbstractTask;
-import org.cytoscape.work.ProvidesTitle;
-import org.cytoscape.work.TaskIterator;
-import org.cytoscape.work.TaskMonitor;
-import org.cytoscape.work.Tunable;
+import org.cytoscape.work.*;
 import org.cytoscape.work.swing.DialogTaskManager;
 import org.cytoscape.work.util.ListSingleSelection;
-import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 /**
  * NeDRex App
  * @author Sepideh Sadegh
- * @modified by: Andreas Maier
+ * @author Andreas Maier
  */
 public class QuickStartTask extends AbstractTask{
 	private Logger logger = LoggerFactory.getLogger(getClass());
@@ -60,18 +51,10 @@ public class QuickStartTask extends AbstractTask{
     
     public QuickStartTask (RepoApplication app) {
     	this.app = app;
+		this.apiUtils = app.getApiRoutesUtil();
     }
 
 	private ApiRoutesUtil apiUtils;
-	@Reference
-	public void setAPIUtils(ApiRoutesUtil apiUtils) {
-		this.apiUtils = apiUtils;
-	}
-
-	public void unsetAPIUtils(ApiRoutesUtil apiUtils) {
-		if (this.apiUtils == apiUtils)
-			this.apiUtils = null;
-	}
 
 	@Override
 	public void run(TaskMonitor taskMonitor) throws Exception {
@@ -124,7 +107,7 @@ public class QuickStartTask extends AbstractTask{
 		
 		////Step 3: Run the selected disease module algorithms on the seeds from step 2
 		if (methodOptions.getSelectedValue().equals(must)) {
-			MuSTAPI must = new MuSTAPI(network, disordersGenes, 5, 5);			
+			MuSTAPI must = new MuSTAPI(app.getNedrexService(), network, disordersGenes, 5, 5);
 			Set<String> seeds_in_network = must.getSeedsInNetwork();
 			Set<List<String>> edges = must.getMuSTEdges();
 			Set<String> mustNodes = must.getMuSTNodes();
@@ -138,7 +121,7 @@ public class QuickStartTask extends AbstractTask{
 			}			
 		}		
 		else if (methodOptions.getSelectedValue().equals(diamond)) {
-			DiamondAPI diamond = new DiamondAPI(network, disordersGenes, 200, 1);
+			DiamondAPI diamond = new DiamondAPI(this.app.getNedrexService(), network, disordersGenes, 200, 1);
 			Set<String> seeds_in_network = diamond.getSeedsInNetwork();
 			Set<List<String>> edges = diamond.getDiamondEdges();
 			Set<String> diamondNodes = diamond.getDiamondNodes();

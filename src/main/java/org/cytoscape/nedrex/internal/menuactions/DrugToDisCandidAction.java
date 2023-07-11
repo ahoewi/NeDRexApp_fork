@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  * NeDRex App
  *
  * @author Sepideh Sadegh
- * @modified by: Andreas Maier
+ * @author Andreas Maier
  */
 public class DrugToDisCandidAction extends AbstractCyAction {
     private RepoApplication app;

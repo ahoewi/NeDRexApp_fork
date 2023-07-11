@@ -15,7 +15,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * NeDRex App
  * @author Sepideh Sadegh
- * @modified by: Andreas Maier
+ * @author Andreas Maier
  */
 public class QuickStartAction extends AbstractCyAction{
 	private RepoApplication app;

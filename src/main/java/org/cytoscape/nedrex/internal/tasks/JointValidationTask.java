@@ -3,14 +3,12 @@ package org.cytoscape.nedrex.internal.tasks;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
@@ -43,7 +41,7 @@ import java.util.Set;
 /**
  * NeDRex App
  * @author Sepideh Sadegh
- * @modified by: Andreas Maier
+ * @author Andreas Maier
  */
 public class JointValidationTask extends AbstractTask{
 	private RepoApplication app;
@@ -108,6 +106,7 @@ public class JointValidationTask extends AbstractTask{
 	
 	public JointValidationTask(RepoApplication app, RepoResultPanel resultPanel) {
 		this.app = app;
+		this.setNedrexService(app.getNedrexService());
 		this.resultPanel = resultPanel;
 	}
 	
@@ -150,10 +149,9 @@ public class JointValidationTask extends AbstractTask{
 		String status_url = this.nedrexService.API_LINK + "validation/status";
 		
 		JSONObject payload = new JSONObject();
-		List<String> true_drugs = new ArrayList<String>();		
-		List<String> result_drugs = new ArrayList<String>();	
-//		List<List<String>> result_drugs = new ArrayList<List<String>>();
-		List<String> module_members = new ArrayList<String>();
+		List<String> true_drugs = new ArrayList<>();
+		List<String> result_drugs = new ArrayList<>();
+		List<String> module_members = new ArrayList<>();
 		String module_member_type = "";
 		int sleep_time = 2; //in seconds
 		
@@ -254,12 +252,11 @@ public class JointValidationTask extends AbstractTask{
 		logger.info("The post JSON converted to string: " + payload.toString());
 		
 		HttpPost post = new HttpPost(submit_url);
-		HttpClient client = new DefaultHttpClient();
 		post.setEntity(new StringEntity(payload.toString(), ContentType.APPLICATION_JSON));
 		String uidd = new String();
 		Boolean failedSubmit = false;
 		try {
-			HttpResponse response = client.execute(post);
+			HttpResponse response = nedrexService.send(post);
 			HttpEntity entity = response.getEntity();
 			BufferedReader rd = new BufferedReader(new InputStreamReader(entity.getContent()));
 			String line = "";
@@ -305,7 +302,7 @@ public class JointValidationTask extends AbstractTask{
 			
 			boolean Success = false;
 			try {
-				HttpResponse response = client.execute(request);
+				HttpResponse response = nedrexService.send(request);
 //				boolean Success = false;
 				boolean Failed = false;
 				  
@@ -328,9 +325,7 @@ public class JointValidationTask extends AbstractTask{
 					}
 					if(Success) {
 						logger.info("The run is successfully completed! This is the response: " + response.getParams());
-//						logger.info("The status line of the response:" + response.getStatusLine());
-//						logger.info("This is the response text of the successful: " + responseText);
-						
+
 						JSONParser parser = new JSONParser();
 						JSONObject json = (JSONObject) parser.parse(responseText);
 						logger.info("The p-val of the response json onbject: " + json.get("emprirical p-value"));
@@ -346,7 +341,7 @@ public class JointValidationTask extends AbstractTask{
 						showFailed();
 						break;
 					}
-					response = client.execute(request);
+					response = nedrexService.send(request);
 					try {
 						logger.info(String.format("Waiting for run to complete, sleeping for %d seconds...", sleep_time));
 						Thread.sleep(sleep_time*1000);
@@ -360,7 +355,6 @@ public class JointValidationTask extends AbstractTask{
 					logger.info("The run is taking very long (more than 10 mins), please try again in 15 mins!");
 					showWarningTime();
 					taskMonitor.showMessage(Level.WARN, "The computation is taking very long! It continues running in the backend, to get the results please try again using the same parameters and input for the algorithm in 15 mins!");
-//					JOptionPane.showMessageDialog(null, "The run is taking very long (more than 10 mins), please try again in 15 mins!", "Run-time out", 3);
 				}
 							  
 			} catch (ClientProtocolException e1) {

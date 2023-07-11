@@ -6,6 +6,7 @@ import org.cytoscape.nedrex.internal.tasks.DeselectSingleNodeTaskFactory;
 import org.cytoscape.nedrex.internal.tasks.OpenEntryInDBTaskFactory;
 import org.cytoscape.nedrex.internal.ui.ComorbiditomeWebServiceClient;
 import org.cytoscape.nedrex.internal.ui.RepoTrialDBWebServiceClient;
+import org.cytoscape.nedrex.internal.utils.ApiRoutesUtil;
 import org.cytoscape.service.util.AbstractCyActivator;
 import org.cytoscape.service.util.CyServiceRegistrar;
 import org.cytoscape.task.NodeViewTaskFactory;
@@ -32,16 +33,24 @@ public class CyActivator extends AbstractCyActivator {
 		
 		this.context = context;
 		this.registrar = this.getService(CyServiceRegistrar.class);
-		
+		NeDRexService nedrexService = new NeDRexService();
+		this.context.registerService(NeDRexService.class,nedrexService , null);
+
+		ApiRoutesUtil apiRoutesUtil = new ApiRoutesUtil(nedrexService);
+		this.context.registerService(ApiRoutesUtil.class,apiRoutesUtil , null);
+
 		// start actual application
-		registerService(new RepoApplication(this), RepoApplication.class);
+		registerService(new RepoApplication(this,nedrexService,  apiRoutesUtil), RepoApplication.class);
 		// to access the registered application
 		RepoApplication app = this.getService(RepoApplication.class);
 		
 		{
+
 			// Register our web service clients
 			RepoTrialDBWebServiceClient client = new RepoTrialDBWebServiceClient(app);
 			registerAllServices(context, client, new Properties());
+
+
 			
 			ComorbiditomeWebServiceClient comorbClient = new ComorbiditomeWebServiceClient(app);
 			registerAllServices(context, comorbClient, new Properties());

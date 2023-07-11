@@ -2,10 +2,8 @@ package org.cytoscape.nedrex.internal.tasks;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.cytoscape.model.*;
 import org.cytoscape.nedrex.internal.*;
 import org.cytoscape.nedrex.internal.io.HttpGetWithEntity;
@@ -32,7 +30,7 @@ import java.util.stream.Collectors;
 /**
  * NeDRex App
  * @author Sepideh Sadegh
- * @modified by: Andreas Maier
+ * @author Andreas Maier
  */
 public class CreateNetRankedDrugTask extends AbstractTask{
 	
@@ -52,6 +50,7 @@ public class CreateNetRankedDrugTask extends AbstractTask{
 	public CreateNetRankedDrugTask(RepoApplication app, Boolean quick, Set<String> proteins, Set<String> drugs, List<List<String>> edgesDrP, 
 			Map<String, Double> drugScoreMap, List<List<String>> edgesPP, String rankinFunction, String newNetName, Set<String> primary_seeds, Boolean ggType) {
 		this.app = app;
+		this.setNedrexService(app.getNedrexService());
 		this.quick = quick;
 		this.proteins = proteins;
 		this.drugs = drugs;
@@ -181,13 +180,12 @@ public class CreateNetRankedDrugTask extends AbstractTask{
 		
 //		String url = String.format("https://api.repotrial.net/%s/attributes_v2/json", drugEntity);
 		String url = String.format(this.nedrexService.API_LINK + "%s/attributes/json", drugEntity);
-		HttpClient httpClient = new DefaultHttpClient();
 		HttpGetWithEntity e = new HttpGetWithEntity();
 		e.setURI(new URI(url));
 		e.setEntity(new StringEntity(payload.toString(), ContentType.APPLICATION_JSON));
 		
 		try {
-			HttpResponse response = httpClient.execute(e);
+			HttpResponse response = nedrexService.send(e);
 			BufferedReader rd = new BufferedReader (new InputStreamReader(response.getEntity().getContent()));
 			String line = "";
 			String  responseText = "";
@@ -198,6 +196,7 @@ public class CreateNetRankedDrugTask extends AbstractTask{
 			JSONParser parser = new JSONParser();
 			JSONArray jarrDrugs = (JSONArray) parser.parse(responseText);			
 			for (Object drug: jarrDrugs) {
+				System.out.println(drug);
 				 JSONObject drugobj = (JSONObject) drug;
 				 String dr = (String) drugobj.get("primaryDomainId");
 				 String dispName = (String) drugobj.get(attrDispName);					 
@@ -235,13 +234,12 @@ public class CreateNetRankedDrugTask extends AbstractTask{
 			url = String.format(this.nedrexService.API_LINK + "%s/attributes/json", geneEntity);
 		}
 		
-		httpClient = new DefaultHttpClient();
 		e = new HttpGetWithEntity();
 		e.setURI(new URI(url));
 		e.setEntity(new StringEntity(payload.toString(), ContentType.APPLICATION_JSON));
 		
 		try {
-			HttpResponse response = httpClient.execute(e);
+			HttpResponse response = nedrexService.send(e);
 			BufferedReader rd = new BufferedReader (new InputStreamReader(response.getEntity().getContent()));
 			String line = "";
 			String  responseText = "";
@@ -268,118 +266,6 @@ public class CreateNetRankedDrugTask extends AbstractTask{
 			e2.printStackTrace();
 		}
 		
-//		HttpGet request = new HttpGet(url);
-//		HttpGet request = new HttpGet("https://api.repotrial.net/trustrank/status");
-//		URI uri = new URIBuilder(request.getURI()).addParameter("uid", uid).build();
-//		((HttpRequestBase) request).setURI(uri);
-//		request.setEntity(new StringEntity(payload.toString(), ContentType.APPLICATION_JSON));
-		
-			
-		/*HttpClient client = new DefaultHttpClient();
-		
-		String url = String.format("https://api.repotrial.net/%s/attributes/%s/json", drugEntity, attrDispName);				
-		HttpGet request = new HttpGet(url);
-		try {
-			HttpResponse response = client.execute(request);
-			BufferedReader rd = new BufferedReader (new InputStreamReader(response.getEntity().getContent()));
-			String line = "";
-			String  responseText = "";
-			while ((line = rd.readLine()) != null) {
-				responseText = line;
-			}
-			
-			JSONParser parser = new JSONParser();
-			JSONArray jarrDrugs = (JSONArray) parser.parse(responseText);			
-			for (Object drug: jarrDrugs) {
-				 JSONObject drugobj = (JSONObject) drug;
-				 String dr = (String) drugobj.get("primaryDomainId");
-				 String dispName = (String) drugobj.get(attrDispName);					 
-				 if (drugs.contains(dr) ) {
-					 drugDispNameMap.put(dr, dispName);
-				 }
-			}
-			logger.info("drugDisplayName map: " + drugDispNameMap);
-				  
-			  
-		} catch (ClientProtocolException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (IOException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
-		
-		url = String.format("https://api.repotrial.net/%s/attributes/%s/json", drugEntity, attrDrugGroups);				
-		HttpGet request2 = new HttpGet(url);
-		try {
-			HttpResponse response = client.execute(request2);
-			BufferedReader rd = new BufferedReader (new InputStreamReader(response.getEntity().getContent()));
-			String line = "";
-			String  responseText = "";
-			while ((line = rd.readLine()) != null) {
-				responseText = line;
-			}
-			
-			JSONParser parser = new JSONParser();
-			JSONArray jarrDrugs = (JSONArray) parser.parse(responseText);						
-			for (Object drugObj: jarrDrugs) {
-				 JSONObject drugJson = (JSONObject) drugObj;
-				 String dr = (String) drugJson.get("primaryDomainId");
-				 JSONArray drugGroups = (JSONArray) drugJson.get(attrDrugGroups);					 
-				 if (drugs.contains(dr) ) {
-					 List<String> groups = new ArrayList<String>();
-					 for (Object groupObj: drugGroups) {
-						 String group = (String) groupObj;
-						 groups.add(group);
-					}					 
-					 drugGroupMap.put(dr, groups);
-				 }
-			}
-			logger.info("drugGroups map: " + drugGroupMap);
-				  
-			  
-		} catch (ClientProtocolException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (IOException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
-		
-		url = String.format("https://api.repotrial.net/%s/attributes/%s/json", proteinEntity, attrDispName);				
-		HttpGet request3 = new HttpGet(url);
-		try {
-			HttpResponse response = client.execute(request3);
-			BufferedReader rd = new BufferedReader (new InputStreamReader(response.getEntity().getContent()));
-			String line = "";
-			String  responseText = "";
-			while ((line = rd.readLine()) != null) {
-				responseText = line;
-			}
-			
-			JSONParser parser = new JSONParser();
-			JSONArray jarrProts = (JSONArray) parser.parse(responseText);			
-			for (Object prot: jarrProts) {
-				 JSONObject proteinobj = (JSONObject) prot;
-				 String pr = (String) proteinobj.get("primaryDomainId");
-				 String dispName = (String) proteinobj.get(attrDispName);					 
-				 if (proteins.contains(pr) ) {
-					 proteinDispNameMap.put(pr, dispName);
-				 }
-			}
-			logger.info("proteinDisplayName map: " + proteinDispNameMap);
-				  
-			  
-		} catch (ClientProtocolException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (IOException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}*/
-		
-//		logger.info("This is the list of seeds in the createNetRanked task: " + primary_seeds);
-//		logger.info("This is the list of proteins/genes in the createNetRanked task: " + proteins);
 		if (!quick) {
 			for (String p: proteins) {	// could be also genes
 				CyNode cynode = newNet.addNode();
@@ -400,18 +286,18 @@ public class CreateNetRankedDrugTask extends AbstractTask{
 		else {
 			for (String p: proteins) {	// could be also genes
 				CyNode cynode = ModelUtil.getNodeWithName(app, newNet, p);
-//				if (primary_seeds.contains(p)) {
-//					newNet.getDefaultNodeTable().getRow(cynode.getSUID()).set(seedCol, true);
-//				}
 				mapCyNode.put(p, cynode);
 			}
 		}
-				
+
+		System.out.println(drugGroupMap);
 		for (String d: drugs) {
+			System.out.println(d);
+			System.out.println(drugGroupMap.containsKey(d));
 			CyNode cynode = newNet.addNode();
 			newNet.getDefaultNodeTable().getRow(cynode.getSUID()).set("name", d);
 			newNet.getDefaultNodeTable().getRow(cynode.getSUID()).set(nodeDisplayNameCol, drugDispNameMap.get(d));
-			newNet.getDefaultNodeTable().getRow(cynode.getSUID()).set(drugGroupCol, String.join(", ", drugGroupMap.get(d)));
+			newNet.getDefaultNodeTable().getRow(cynode.getSUID()).set(drugGroupCol, drugGroupMap.containsKey(d) ? String.join(", ", drugGroupMap.get(d)): "");
 			newNet.getDefaultNodeTable().getRow(cynode.getSUID()).set(nodeTypeCol, NodeType.Drug.toString());			
 //			newNet.getDefaultNodeTable().getRow(cynode.getSUID()).set(score, drugScoreMap.get(d));
 			if (!drugScoreMap.keySet().isEmpty()) {

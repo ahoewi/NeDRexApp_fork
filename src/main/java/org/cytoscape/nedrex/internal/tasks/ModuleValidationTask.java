@@ -3,14 +3,12 @@ package org.cytoscape.nedrex.internal.tasks;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
@@ -43,7 +41,7 @@ import java.util.Set;
 /**
  * NeDRex App
  * @author Sepideh Sadegh
- * @modified by: Andreas Maier
+ * @author Andreas Maier
  */
 public class ModuleValidationTask extends AbstractTask{
 	private RepoApplication app;
@@ -96,6 +94,7 @@ public class ModuleValidationTask extends AbstractTask{
 	
 	public ModuleValidationTask(RepoApplication app, RepoResultPanel resultPanel) {
 		this.app = app;
+		this.setNedrexService(app.getNedrexService());
 		this.resultPanel = resultPanel;
 	}
 	
@@ -151,7 +150,7 @@ public class ModuleValidationTask extends AbstractTask{
 				}
 			}				
 		}
-		else if (trueDrugFile) {
+		else{
 			String fp = inputTDFile.getPath();
 			try {
 				BufferedReader br = new BufferedReader(new FileReader(fp));
@@ -184,7 +183,7 @@ public class ModuleValidationTask extends AbstractTask{
 				module_members.add(network.getRow(n).get(CyNetwork.NAME, String.class));
 			}					
 		}
-		else if (moduleFile) {
+		else{
 			String fp = inputModuleFile.getPath();
 			try {
 				BufferedReader br = new BufferedReader(new FileReader(fp));
@@ -217,12 +216,11 @@ public class ModuleValidationTask extends AbstractTask{
 		logger.info("The post JSON converted to string: " + payload.toString());
 		
 		HttpPost post = new HttpPost(submit_url);
-		HttpClient client = new DefaultHttpClient();
 		post.setEntity(new StringEntity(payload.toString(), ContentType.APPLICATION_JSON));
 		String uidd = new String();
 		Boolean failedSubmit = false;
 		try {
-			HttpResponse response = client.execute(post);
+			HttpResponse response = nedrexService.send(post);
 			HttpEntity entity = response.getEntity();
 			BufferedReader rd = new BufferedReader(new InputStreamReader(entity.getContent()));
 			String line = "";
@@ -261,14 +259,11 @@ public class ModuleValidationTask extends AbstractTask{
 			URI uri = new URIBuilder(request.getURI()).addParameter("uid", uid).build();
 			((HttpRequestBase) request).setURI(uri);
 			
-//			logger.info("The URI: "+ uri);
-			logger.info("The uid: " + uid);		
-//			logger.info("The request URI: "+request.getURI().toString());
-//			logger.info("The request line: "+ request.getRequestLine());
-			
+			logger.info("The uid: " + uid);
+
 			boolean Success = false;
 			try {
-				HttpResponse response = client.execute(request);
+				HttpResponse response = nedrexService.send(request);
 //				boolean Success = false;
 				boolean Failed = false;
 				  
@@ -281,7 +276,6 @@ public class ModuleValidationTask extends AbstractTask{
 					String line = "";
 					while ((line = rd.readLine()) != null) {
 						System.out.println(line);
-//						logger.info("The response entity of the status: " +line);
 						if (line.contains("completed"))
 							Success=true;
 							responseText = line;
@@ -291,9 +285,7 @@ public class ModuleValidationTask extends AbstractTask{
 					}
 					if(Success) {
 						logger.info("The run is successfully completed! This is the response: " + response.getParams());
-//						logger.info("The status line of the response:" + response.getStatusLine());
-//						logger.info("This is the response text of the successful: " + responseText);
-						
+
 						JSONParser parser = new JSONParser();
 						JSONObject json = (JSONObject) parser.parse(responseText);
 						logger.info("The p-val of the response json onbject: " + json.get("emprirical p-value"));
@@ -309,7 +301,7 @@ public class ModuleValidationTask extends AbstractTask{
 						showFailed();
 						break;
 					}
-					response = client.execute(request);
+					response = nedrexService.send(request);
 					try {
 						logger.info(String.format("Waiting for run to complete, sleeping for %d seconds...", sleep_time));
 						Thread.sleep(sleep_time*1000);
