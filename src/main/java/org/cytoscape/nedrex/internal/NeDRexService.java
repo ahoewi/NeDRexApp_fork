@@ -44,7 +44,6 @@ public class NeDRexService {
                 .setConnectionManager(cm)
                 .build();
         this.apiKey = getAPIKey();  // Moved this line below the API_client initialization
-        System.out.println(this.apiKey);
     }
 
 

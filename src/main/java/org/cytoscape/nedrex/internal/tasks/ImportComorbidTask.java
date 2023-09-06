@@ -189,8 +189,9 @@ public class ImportComorbidTask extends AbstractTask{
                     System.out.println(urlp);
                     DialogTaskManager taskmanager = app.getActivator().getService(DialogTaskManager.class);
                     File file = File.createTempFile("comorbiditome", ".graphml");
-                    taskmanager.execute(new TaskIterator(new DownloadNetworkTask(app,urlp, file, nedrexService)));
-                    taskmanager.execute(new TaskIterator(new ImportNetworkTask(app,file)));
+//                    taskmanager.execute(new TaskIterator(new DownloadNetworkTask(app,urlp, file, nedrexService)));
+//                    taskmanager.execute(new TaskIterator(new ImportNetworkTask(app,file)));
+                    taskmanager.execute(new TaskIterator(new DownloadNetworkTask(app, urlp, file, nedrexService), new ImportNetworkTask(app, file)));
                     break;
                 }
                 if (Failed) {

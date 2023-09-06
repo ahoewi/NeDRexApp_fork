@@ -59,8 +59,6 @@ public class MuSTAPI {
 
 	private void runAlgorithm() throws URISyntaxException, ParseException {
 				
-//		String submit_url = "https://api.repotrial.net/must/submit";
-//		String status_url = "https://api.repotrial.net/must/status";
 		String submit_url = this.nedrexService.API_LINK + "must/submit";
 		String status_url = this.nedrexService.API_LINK + "must/status";
 		System.out.println("The submit url: " + submit_url);
@@ -102,7 +100,6 @@ public class MuSTAPI {
 				logger.info("The uri of the response to the post: "+line + "\n");
 				uidd = line;
 			  }
-			System.out.println(uidd);
 			EntityUtils.consume(entity);
 		} catch (ClientProtocolException e1) {
 			// TODO Auto-generated catch block
