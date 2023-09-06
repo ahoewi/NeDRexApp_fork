@@ -184,10 +184,9 @@ public class ImportComorbidTask extends AbstractTask{
                         urlp = this.nedrexService.API_LINK+"comorbiditome/download_comorbiditome_build/"+uid+"/graphml/"+networkName+".graphml";
                     }
                     else {
-                    	urlp = this.nedrexService.API_LINK+"comorbiditome/download_comorbiditome_build/"+uid+"/graphml/"+uid.toString()+".graphml";
-                        
+                    	urlp = this.nedrexService.API_LINK+"comorbiditome/download_comorbiditome_build/"+uid+"/graphml/"+uid+".graphml";
                     }
-
+                    System.out.println(urlp);
                     DialogTaskManager taskmanager = app.getActivator().getService(DialogTaskManager.class);
                     File file = File.createTempFile("comorbiditome", ".graphml");
                     taskmanager.execute(new TaskIterator(new DownloadNetworkTask(app,urlp, file, nedrexService)));

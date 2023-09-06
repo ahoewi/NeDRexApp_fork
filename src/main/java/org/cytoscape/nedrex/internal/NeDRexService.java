@@ -8,6 +8,9 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.cytoscape.nedrex.internal.io.HttpGetWithEntity;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.osgi.service.component.annotations.Component;
 
 import java.io.BufferedReader;
@@ -27,17 +30,23 @@ public class NeDRexService {
     public static final String TUTORIAL_LINK = "https://nedrex.net/tutorial/";
     public static final String API_LINK = "https://api.nedrex.net/licensed/";
 
-    public HttpClient API_client;
+    public CloseableHttpClient API_client;
     public static final String NEDREX_LINK = "https://nedrex.net";
     public static final String CITATION_LINK = "https://www.nature.com/articles/s41467-021-27138-2";
 
     private String apiKey = null;
 
     public NeDRexService() {
-        API_client = new DefaultHttpClient();
-        this.apiKey = getAPIKey();
+        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
+        cm.setMaxTotal(100);
+        cm.setDefaultMaxPerRoute(20);
+        this.API_client = HttpClients.custom()
+                .setConnectionManager(cm)
+                .build();
+        this.apiKey = getAPIKey();  // Moved this line below the API_client initialization
         System.out.println(this.apiKey);
     }
+
 
     public void setCredentials(HttpURLConnection connection) {
         connection.setRequestProperty("x-api-key", this.apiKey);

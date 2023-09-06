@@ -49,8 +49,6 @@ public class ImportNetworkTask extends AbstractTask{
 		file.delete();
 		taskMonitor.setProgress(1.0);
 		logger.info("Loading file done");
-
-
 	}
 
 }

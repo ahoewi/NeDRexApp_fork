@@ -44,7 +44,7 @@ public class DiamondAPI {
 	Set<String> diamondNodes = new HashSet<String>();
 	Map<String, Integer> scoreMap = new HashMap <String, Integer>();
 	Map<String, Double> pHyperMap = new HashMap <String, Double>();
-	Boolean Success;
+	Boolean Success = false;
 	
 	public DiamondAPI(NeDRexService nedrexService, CyNetwork network, Set<CyNode> seeds, Integer iter, Integer alpha) throws ParseException, URISyntaxException {
 		this.nedrexService = nedrexService;
@@ -77,6 +77,7 @@ public class DiamondAPI {
 
 		for (CyNode n: seeds) {
 			geneNames.add(network.getRow(n).get(CyNetwork.NAME, String.class).replaceFirst("entrez.", ""));
+
 		}
 				
 		payload.put("seeds", geneNames);
@@ -106,7 +107,7 @@ public class DiamondAPI {
 				System.out.println(line);
 				logger.info("The uri of the response to the post: "+line + "\n");
 				uidd = line;
-				if (line.contains("No seed genes submitted")) {
+				if (line.contains("No seeds submitted")) {
 					failedSubmit=true;
 				}			
 			  }
