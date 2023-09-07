@@ -11,8 +11,10 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+
 /**
  * NeDRex App
+ *
  * @author Judith Bernett
  * @author Andreas Maier
  */
@@ -32,6 +34,7 @@ public class InfoBox {
     String tutorialURI;
 
     private NeDRexService nedrexService;
+
     @Reference
     public void setNedrexService(NeDRexService nedrexService) {
         this.nedrexService = nedrexService;
@@ -41,10 +44,11 @@ public class InfoBox {
         if (this.nedrexService == nedrexService)
             this.nedrexService = null;
     }
+
     private String licenseURI = this.nedrexService.API_LINK + "static/licence";
     private Logger logger = LoggerFactory.getLogger(getClass());
 
-    public InfoBox(RepoApplication app, String message){
+    public InfoBox(RepoApplication app, String message) {
         this.app = app;
         this.message = message;
         this.title = "Information";
@@ -52,8 +56,8 @@ public class InfoBox {
         this.options = new Object[]{"Continue", "Cancel"};
         this.hide = false;
     }
-    
-    public InfoBox(RepoApplication app, String message, String tutorialURI){
+
+    public InfoBox(RepoApplication app, String message, String tutorialURI) {
         this.app = app;
         this.tutorialURI = tutorialURI;
         this.buttonTutorial = new JButton();
@@ -63,7 +67,7 @@ public class InfoBox {
         buttonTutorial.setOpaque(false);
         buttonTutorial.setBackground(Color.WHITE);
         try {
-        	buttonTutorial.addActionListener(new OpenInWeb(new URI(tutorialURI)));
+            buttonTutorial.addActionListener(new OpenInWeb(new URI(tutorialURI)));
         } catch (URISyntaxException e) {
             logger.info("button action listener failed");
         }
@@ -73,8 +77,8 @@ public class InfoBox {
         this.options = new Object[]{"Continue", "Cancel"};
         this.hide = false;
     }
-    
-    public InfoBox(RepoApplication app, String message, String tutorialURI, Boolean drug_involved){
+
+    public InfoBox(RepoApplication app, String message, String tutorialURI, Boolean drug_involved) {
         this.app = app;
         this.tutorialURI = tutorialURI;
         this.buttonTutorial = new JButton();
@@ -84,7 +88,7 @@ public class InfoBox {
         buttonTutorial.setOpaque(false);
         buttonTutorial.setBackground(Color.WHITE);
         try {
-        	buttonTutorial.addActionListener(new OpenInWeb(new URI(tutorialURI)));
+            buttonTutorial.addActionListener(new OpenInWeb(new URI(tutorialURI)));
         } catch (URISyntaxException e) {
             logger.info("button action listener failed");
         }
@@ -95,7 +99,7 @@ public class InfoBox {
         buttonLicense.setOpaque(false);
         buttonLicense.setBackground(Color.WHITE);
         try {
-        	buttonLicense.addActionListener(new OpenInWeb(new URI(licenseURI)));
+            buttonLicense.addActionListener(new OpenInWeb(new URI(licenseURI)));
         } catch (URISyntaxException e) {
             logger.info("button action listener failed");
         }
@@ -127,8 +131,8 @@ public class InfoBox {
         this.options = new Object[]{"Continue", "Cancel"};
         this.hide = false;
     }*/
-    
-    public InfoBox(RepoApplication app, String message, String linkMessage, String linkURI, String tutorialURI){
+
+    public InfoBox(RepoApplication app, String message, String linkMessage, String linkURI, String tutorialURI) {
         this.app = app;
         this.linkURI = linkURI;
         this.buttonPaper = new JButton();
@@ -139,7 +143,7 @@ public class InfoBox {
         buttonPaper.setOpaque(false);
         buttonPaper.setBackground(Color.WHITE);
         try {
-        	buttonPaper.addActionListener(new OpenInWeb(new URI(linkURI)));
+            buttonPaper.addActionListener(new OpenInWeb(new URI(linkURI)));
         } catch (URISyntaxException e) {
             logger.info("button action listener failed");
         }
@@ -149,7 +153,7 @@ public class InfoBox {
         buttonTutorial.setOpaque(false);
         buttonTutorial.setBackground(Color.WHITE);
         try {
-        	buttonTutorial.addActionListener(new OpenInWeb(new URI(tutorialURI)));
+            buttonTutorial.addActionListener(new OpenInWeb(new URI(tutorialURI)));
         } catch (URISyntaxException e) {
             logger.info("button action listener failed");
         }
@@ -159,31 +163,38 @@ public class InfoBox {
         this.options = new Object[]{"Continue", "Cancel"};
         this.hide = false;
     }
-    
-    public InfoBox(RepoApplication app, String message, String linkMessage, String linkURI, String tutorialURI, Boolean drug_involved){
+
+    public InfoBox(RepoApplication app, String message, String linkMessage, String linkURI, String tutorialURI, Boolean drug_involved) {
         this.app = app;
         this.linkURI = linkURI;
-        this.buttonPaper = new JButton();
-        this.buttonTutorial = new JButton();
-        buttonPaper.setText("<HTML> This algorithm was developed by <FONT color=\"#000099\"><U>" + linkMessage + "</U></FONT> <br></HTML>");
-        buttonPaper.setHorizontalAlignment(SwingConstants.LEFT);
-        buttonPaper.setBorderPainted(false);
-        buttonPaper.setOpaque(false);
-        buttonPaper.setBackground(Color.WHITE);
-        try {
-        	buttonPaper.addActionListener(new OpenInWeb(new URI(linkURI)));
-        } catch (URISyntaxException e) {
-            logger.info("button action listener failed");
+        if (linkMessage != null) {
+            this.buttonPaper = new JButton();
+            buttonPaper.setText("<HTML> This algorithm was developed by <FONT color=\"#000099\"><U>" + linkMessage + "</U></FONT> <br></HTML>");
+            buttonPaper.setHorizontalAlignment(SwingConstants.LEFT);
+            buttonPaper.setBorderPainted(false);
+            buttonPaper.setOpaque(false);
+            buttonPaper.setBackground(Color.WHITE);
+
+            try {
+                buttonPaper.addActionListener(new OpenInWeb(new URI(linkURI)));
+            } catch (URISyntaxException e) {
+                logger.info("button action listener failed");
+            }
         }
-        buttonTutorial.setText("<HTML> For more info visit <FONT color=\"#000099\"><U> our tutorial</U></FONT>.<br></HTML>");
-        buttonTutorial.setHorizontalAlignment(SwingConstants.LEFT);
-        buttonTutorial.setBorderPainted(false);
-        buttonTutorial.setOpaque(false);
-        buttonTutorial.setBackground(Color.WHITE);
-        try {
-        	buttonTutorial.addActionListener(new OpenInWeb(new URI(tutorialURI)));
-        } catch (URISyntaxException e) {
-            logger.info("button action listener failed");
+        if (tutorialURI != null) {
+
+            this.buttonTutorial = new JButton();
+            buttonTutorial.setText("<HTML> For more info visit <FONT color=\"#000099\"><U> our tutorial</U></FONT>.<br></HTML>");
+            buttonTutorial.setHorizontalAlignment(SwingConstants.LEFT);
+            buttonTutorial.setBorderPainted(false);
+            buttonTutorial.setOpaque(false);
+            buttonTutorial.setBackground(Color.WHITE);
+
+            try {
+                buttonTutorial.addActionListener(new OpenInWeb(new URI(tutorialURI)));
+            } catch (URISyntaxException e) {
+                logger.info("button action listener failed");
+            }
         }
         this.buttonLicense = new JButton();
         buttonLicense.setText("<HTML> Using NeDRex is subject to agreeing with terms of use described in the <FONT color=\"#000099\"><U>NeDRex End User License Agreement</U></FONT>.</HTML>");
@@ -192,7 +203,7 @@ public class InfoBox {
         buttonLicense.setOpaque(false);
         buttonLicense.setBackground(Color.WHITE);
         try {
-        	buttonLicense.addActionListener(new OpenInWeb(new URI(licenseURI)));
+            buttonLicense.addActionListener(new OpenInWeb(new URI(licenseURI)));
         } catch (URISyntaxException e) {
             logger.info("button action listener failed");
         }
@@ -203,28 +214,27 @@ public class InfoBox {
         this.options = new Object[]{"Continue", "Cancel"};
         this.hide = false;
     }
-    
-    
 
-    public int showMessage(){
+
+    public int showMessage() {
         JPanel messagePanel = new JPanel();
         messagePanel.setLayout(new BoxLayout(messagePanel, BoxLayout.PAGE_AXIS));
         messagePanel.add(new JLabel(message));
-        if(buttonPaper != null) {
+        if (buttonPaper != null) {
             messagePanel.add(buttonPaper);
         }
-        if(buttonTutorial != null) {
+        if (buttonTutorial != null) {
             messagePanel.add(buttonTutorial);
         }
-        if(buttonLicense != null) {
+        if (buttonLicense != null) {
             messagePanel.add(buttonLicense);
         }
-        if(licensebox != null) {
+        if (licensebox != null) {
             messagePanel.add(licensebox);
             JLabel dummy = new JLabel(" ");
             messagePanel.add(dummy);
         }
-        
+
         messagePanel.add(checkbox);
         return JOptionPane.showOptionDialog(
                 app.getCySwingApplication().getJFrame(),
@@ -272,7 +282,7 @@ public class InfoBox {
     public JCheckBox getCheckbox() {
         return checkbox;
     }
-    
+
     public JCheckBox getLicensbox() {
         return licensebox;
     }
@@ -280,7 +290,7 @@ public class InfoBox {
     static class OpenInWeb implements ActionListener {
         URI uri;
 
-        public OpenInWeb(URI uri){
+        public OpenInWeb(URI uri) {
             this.uri = uri;
         }
 

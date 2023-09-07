@@ -44,8 +44,7 @@ public class ICD10toMONDOAction extends AbstractCyAction {
         this.app = app;
         String message = "<html><body>Convert ICD10 diseases to MONDO diseases to for further analysis on the general NeDRex knowledge graph.<br><br>Before continuing with this function, make sure you have:<br><b>selected a list of diseases from the comorbiditome</b></body></html>";
 
-//        TODO add terms of use box
-        this.infoBox = new InfoBox(app, message, "Sadegh et al.", "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7360763/", this.nedrexService.TUTORIAL_LINK + "availableFunctions.html#must-on-current-network");
+        this.infoBox = new InfoBox(app, message, null, null, null, true);
         putValue(SHORT_DESCRIPTION, "Convert ICD10 diseases to MONDO diseases to for further analysis on the general NeDRex knowledge graph."
         );
     }
