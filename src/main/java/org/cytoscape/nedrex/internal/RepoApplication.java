@@ -131,6 +131,8 @@ public class RepoApplication {
 		this.application.addAction(new DiseasomeAction(this));
 		this.application.addAction(new DrugomeAction(this));
 
+		this.application.addAction(new ICD10toMONDOAction(this));
+
 		this.application.addAction(new CreateVisStyleAction(this));
 		
 		this.application.addAction(new ShowResultPanelAction(resultPanel));

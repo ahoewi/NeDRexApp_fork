@@ -28,7 +28,9 @@ public enum InteractionType {
 	drug_disease(NodeType.Drug, NodeType.Disease, "DrugHasIndication", "drug_has_indication"),
 	// added the following types for Drugome
 	drug_indication_drug (NodeType.Drug, NodeType.Drug, "DrugSharedIndicationDrug", "drug-sharedIndication_drug"),
-	drug_target_drug (NodeType.Drug, NodeType.Drug, "DrugSharedTargetDrug", "drug-sharedTarget_drug");
+	drug_target_drug (NodeType.Drug, NodeType.Drug, "DrugSharedTargetDrug", "drug-sharedTarget_drug"),
+
+	disease_comorbid_disease (NodeType.Disease, NodeType.Disease, "DisorderComorbidWithDisorder", "disorder_comordbid_with_disorder");
 		
 
 	private static Logger logger = LoggerFactory.getLogger(InteractionType.class);
