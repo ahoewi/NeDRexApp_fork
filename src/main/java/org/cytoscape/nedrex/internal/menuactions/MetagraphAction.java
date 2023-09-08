@@ -5,6 +5,7 @@ import org.cytoscape.nedrex.internal.InfoBox;
 import org.cytoscape.nedrex.internal.NeDRexService;
 import org.cytoscape.nedrex.internal.RepoApplication;
 import org.cytoscape.nedrex.internal.tasks.ICD10toMONDOTask;
+import org.cytoscape.nedrex.internal.tasks.MetagraphTask;
 import org.cytoscape.work.TaskIterator;
 import org.cytoscape.work.swing.DialogTaskManager;
 import org.osgi.service.component.annotations.Reference;
@@ -18,7 +19,7 @@ import java.awt.event.ActionEvent;
  *
  * @author Andreas Maier
  */
-public class ICD10toMONDOAction extends AbstractCyAction {
+public class MetagraphAction extends AbstractCyAction {
     private RepoApplication app;
     private Logger logger = LoggerFactory.getLogger(getClass());
     private InfoBox infoBox;
@@ -36,15 +37,15 @@ public class ICD10toMONDOAction extends AbstractCyAction {
     }
 
 
-    public ICD10toMONDOAction(RepoApplication app) {
-        super("ICD10 to MONDO");
-        setPreferredMenu("Apps.NeDRex.Comorbidity Functions");
-        setMenuGravity(10.0f);
+    public MetagraphAction(RepoApplication app) {
+        super("Metagraph (used)");
+        setPreferredMenu("Apps.NeDRex");
+        setMenuGravity(30.0f);
         this.app = app;
-        String message = "<html><body>Convert ICD10 diseases to MONDO diseases to for further analysis on the general NeDRex knowledge graph.<br><br>Before continuing with this function, make sure you have:<br><b>selected a list of diseases from the comorbiditome</b></body></html>";
+        String message = "<html><body>This will create a new NeDRex metagraph network.</body></html>";
 
-        this.infoBox = new InfoBox(app, message, null, null, null, true);
-        putValue(SHORT_DESCRIPTION, "Convert ICD10 diseases to MONDO diseases to for further analysis on the general NeDRex knowledge graph."
+        this.infoBox = new InfoBox(app, message, null, null, null);
+        putValue(SHORT_DESCRIPTION, "creates a new NeDRex metagraph network."
         );
     }
 
@@ -65,7 +66,7 @@ public class ICD10toMONDOAction extends AbstractCyAction {
             if (returnedValue == 0) {
                 //Continue
                 DialogTaskManager taskmanager = app.getActivator().getService(DialogTaskManager.class);
-                taskmanager.execute(new TaskIterator(new ICD10toMONDOTask(app)));
+                taskmanager.execute(new TaskIterator(new MetagraphTask(app)));
                 if (infoBox.getCheckbox().isSelected()) {
                     //Don't show this again
                     infoBox.setHide(true);
@@ -73,7 +74,7 @@ public class ICD10toMONDOAction extends AbstractCyAction {
             }
         } else {
             DialogTaskManager taskmanager = app.getActivator().getService(DialogTaskManager.class);
-            taskmanager.execute(new TaskIterator(new ICD10toMONDOTask(app)));
+            taskmanager.execute(new TaskIterator(new MetagraphTask(app)));
         }
 
     }

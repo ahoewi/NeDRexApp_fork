@@ -135,27 +135,31 @@ public class InfoBox {
     public InfoBox(RepoApplication app, String message, String linkMessage, String linkURI, String tutorialURI) {
         this.app = app;
         this.linkURI = linkURI;
-        this.buttonPaper = new JButton();
-        this.buttonTutorial = new JButton();
-        buttonPaper.setText("<HTML> This algorithm was developed by <FONT color=\"#000099\"><U>" + linkMessage + "</U></FONT> <br></HTML>");
-        buttonPaper.setHorizontalAlignment(SwingConstants.LEFT);
-        buttonPaper.setBorderPainted(false);
-        buttonPaper.setOpaque(false);
-        buttonPaper.setBackground(Color.WHITE);
-        try {
-            buttonPaper.addActionListener(new OpenInWeb(new URI(linkURI)));
-        } catch (URISyntaxException e) {
-            logger.info("button action listener failed");
+        if (linkMessage != null && linkURI != null) {
+            this.buttonPaper = new JButton();
+            buttonPaper.setText("<HTML> This algorithm was developed by <FONT color=\"#000099\"><U>" + linkMessage + "</U></FONT> <br></HTML>");
+            buttonPaper.setHorizontalAlignment(SwingConstants.LEFT);
+            buttonPaper.setBorderPainted(false);
+            buttonPaper.setOpaque(false);
+            buttonPaper.setBackground(Color.WHITE);
+            try {
+                buttonPaper.addActionListener(new OpenInWeb(new URI(linkURI)));
+            } catch (URISyntaxException e) {
+                logger.info("button action listener failed");
+            }
         }
-        buttonTutorial.setText("<HTML> For more info visit <FONT color=\"#000099\"><U> our tutorial</U></FONT>.<br><br><br></HTML>");
-        buttonTutorial.setHorizontalAlignment(SwingConstants.LEFT);
-        buttonTutorial.setBorderPainted(false);
-        buttonTutorial.setOpaque(false);
-        buttonTutorial.setBackground(Color.WHITE);
-        try {
-            buttonTutorial.addActionListener(new OpenInWeb(new URI(tutorialURI)));
-        } catch (URISyntaxException e) {
-            logger.info("button action listener failed");
+        if(tutorialURI != null) {
+            this.buttonTutorial = new JButton();
+            buttonTutorial.setText("<HTML> For more info visit <FONT color=\"#000099\"><U> our tutorial</U></FONT>.<br><br><br></HTML>");
+            buttonTutorial.setHorizontalAlignment(SwingConstants.LEFT);
+            buttonTutorial.setBorderPainted(false);
+            buttonTutorial.setOpaque(false);
+            buttonTutorial.setBackground(Color.WHITE);
+            try {
+                buttonTutorial.addActionListener(new OpenInWeb(new URI(tutorialURI)));
+            } catch (URISyntaxException e) {
+                logger.info("button action listener failed");
+            }
         }
         this.message = message;
         this.title = "Information";

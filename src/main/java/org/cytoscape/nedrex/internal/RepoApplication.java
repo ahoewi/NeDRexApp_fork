@@ -134,9 +134,11 @@ public class RepoApplication {
 		this.application.addAction(new ICD10toMONDOAction(this));
 
 		this.application.addAction(new CreateVisStyleAction(this));
-		
+
+		this.application.addAction(new MetagraphAction(this));
+
 		this.application.addAction(new ShowResultPanelAction(resultPanel));
-		
+
 		this.application.addAction(new AboutAction(this, aboutPanel));
 		
 		this.application.addAction(new LicenseAction(this, licensePanel));
