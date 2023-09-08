@@ -22,7 +22,7 @@ import java.util.Set;
 
 /**
  * NeDRex App
- * @author Sepideh Sadegh
+ * @author Sepideh Sadegh, Andreas Maier
  */
 public class RepoApplication {
 	private CyActivator activator;
@@ -99,6 +99,7 @@ public class RepoApplication {
 		this.application.addAction(new GetDiseaseDrugsAction(this));
 		
 		this.application.addAction(new DiamondAction(this));
+		this.application.addAction(new RobustAction(this));
 		this.application.addAction(new MuSTapiAction(this));
 		this.application.addAction(new BiConAction(this, resultPanel));
 		
