@@ -2,6 +2,8 @@ package org.cytoscape.nedrex.internal;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
@@ -46,13 +48,13 @@ public class DownloadNetworkTask extends AbstractTask {
     @Override
     public void run(TaskMonitor taskMonitor) throws Exception {
         taskMonitor.setTitle("Downloading the network");
-        BufferedWriter bw = new BufferedWriter(new FileWriter(this.file));
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(Files.newOutputStream(this.file.toPath()), StandardCharsets.UTF_8));
         double p = 0.1;
         taskMonitor.setProgress(p);
         taskMonitor.setStatusMessage("Downloading your network into Cytoscape. Depending on the network and your internet speed, this may take some minutes...");
         HttpGet request = new HttpGet(this.urlp);
         HttpResponse response = nedrexService.send(request);
-        BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+        BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8));
         String line = "";
         int lines = 0;
         boolean progress = true;

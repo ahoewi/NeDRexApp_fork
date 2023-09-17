@@ -47,6 +47,7 @@ public class ImportNetworkTask extends AbstractTask{
 		taskMonitor.setProgress(0.9);
 		taskMonitor.setStatusMessage("Deleting temporary network file...");
 		file.delete();
+		logger.info("File saved at: " + file.getAbsolutePath());
 		taskMonitor.setProgress(1.0);
 		logger.info("Loading file done");
 	}

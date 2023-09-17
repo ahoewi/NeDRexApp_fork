@@ -77,10 +77,10 @@ public class NeighborModuleTask extends AbstractTask{
 		Set <CyNode> selCyNodes = new HashSet<CyNode> ();
 		for (CyRow snr: selNRows) {
 			//selNodes.add(snr.get("SUID", Long.class));
-			selCyNodes.add(network.getNode(snr.get("SUID", Long.class)));			
+			selCyNodes.add(network.getNode(snr.get("SUID", Long.class)));
+			System.out.println("Selected node: " + snr.get("name", String.class));
 		}
-		logger.info("Selected nodes:" + selCyNodes);
-		
+
 		// use setNeighP for source nodes of edges proteins-disease
 		Map<String, Set<String>> sPtDmap = new HashMap<String, Set<String>>();
 		Map<CyNode, Set<CyNode>> sPtDCyNodemap = new HashMap<CyNode, Set<CyNode>>();
@@ -132,13 +132,15 @@ public class NeighborModuleTask extends AbstractTask{
 			}
 			
 			/// selecting found 1st neighboring proteins for the initially selected set of proteins
-			Set<CyEdge> ppEdgeSet = new HashSet<CyEdge>(ppEdge);			
+			Set<CyEdge> ppEdgeSet = new HashSet<CyEdge>(ppEdge);
+			System.out.println("Find matching proteins in "+ ppEdgeSet.size() + " edges");
 			for (CyEdge ce: ppEdgeSet) {
 				Collection <CyRow> matchedERows = network.getDefaultEdgeTable().getMatchingRows("SUID", ce.getSUID());
 				for (CyRow cr: matchedERows) {
 					cr.set("selected", true);
 				}
 			}
+			System.out.println("Identified "+ setNeighP.size() + " neighboring proteins");
 			
 //			logger.info("The set of neighboring proteins including seeds to start brokerage score calculations: " + setNeighP);
 //			ModulFunctions.compute_brokerage(network, setNeighP);
@@ -261,7 +263,9 @@ public class NeighborModuleTask extends AbstractTask{
 		cmdex.executeCommand("network", "create", args, null);
 		
 		if (ppi) {
+			System.out.println("Computing SPD");
 			ModulFunctions.compute_brokerage(network, ModelUtil.getNetworkWithName(app, newNetName), setNeighP);
+			System.out.println("Computed SPD");
 		}
 		insertTasksAfterCurrentTask(new CreateNewEdgesTask(app, sPtDmap, sPtDCyNodemap, netSuid, newNetName));
 		insertTasksAfterCurrentTask(new DeselectAll(app, network));
